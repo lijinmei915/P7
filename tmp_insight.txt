@@ -1,0 +1,151 @@
+function InsightPage({ onBack }: { onBack: () => void }) {
+  return (
+    <motion.div
+      key="insight"
+      initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
+      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 xl:p-16 flex-1 relative z-10 h-full w-full overflow-y-auto overflow-x-hidden scrollbar-hide bg-[#0B0F19]"
+    >
+      {/* Background elements */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] z-0 pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1853FF]/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-500/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
+
+      {/* Header */}
+      <header className="flex justify-between items-center z-10 relative mb-6 lg:mb-8 shrink-0">
+        <div 
+          className="flex items-center gap-4 cursor-pointer group" 
+          onClick={onBack}
+        >
+          <div className="flex -space-x-1.5 shadow-sm group-hover:scale-110 transition-transform">
+            <div className="w-5 h-5 rounded-full bg-[#1853FF] relative z-10 ring-2 ring-[#0B0F19]" />
+            <div className="w-5 h-5 rounded-full bg-[#00D084] ring-2 ring-[#0B0F19]" />
+          </div>
+          <h1 className="text-[14px] font-black tracking-[0.2em] text-white uppercase mt-0.5 flex items-center">
+            <ChevronLeft className="w-4 h-4 mr-1 opacity-0 group-hover:opacity-100 transition-all -ml-5 group-hover:ml-0 text-[#1853FF]" strokeWidth={3} />
+            <span className="group-hover:text-[#1853FF] transition-colors">CASE 01 / INDUSTRY INSIGHT</span>
+          </h1>
+        </div>
+        <div className="text-lg lg:text-xl font-bold text-slate-600 tracking-wider">
+          03
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex flex-col flex-1 min-h-0 relative z-10">
+        <h2 className="text-xl md:text-2xl lg:text-[28px] xl:text-[34px] font-black text-white mb-10 lg:mb-12 xl:mb-16 tracking-tight shrink-0 drop-shadow-md">
+          从渠道扩张转向终端精耕，<br className="hidden lg:block" />系统必须走向<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">经营赋能</span>
+        </h2>
+
+        <div className="flex flex-col md:flex-row gap-4 xl:gap-8 items-stretch pb-0 h-full">
+          
+          {/* PAST Box (Faded, legacy vibe) */}
+          <div className="flex-[1] border border-slate-700/50 rounded-[1.5rem] lg:rounded-[2rem] p-6 xl:p-8 bg-slate-800/40 backdrop-blur-md flex flex-col hover:bg-slate-800/60 transition-all duration-300 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none transition-opacity group-hover:opacity-100 opacity-50"></div>
+            
+            <div className="text-[11px] lg:text-[12px] text-slate-500 mb-4 xl:mb-6 tracking-[0.15em] uppercase font-bold flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-slate-500"></div>
+              PAST / 规模扩张
+            </div>
+            
+            <h3 className="text-lg lg:text-[20px] xl:text-[22px] font-bold mb-3 xl:mb-4 text-slate-200 tracking-tight group-hover:text-white transition-colors">
+              增长来自“铺得更广”
+            </h3>
+            
+            <p className="text-slate-400 text-[13px] lg:text-[14px] leading-relaxed mb-6 xl:mb-8 line-clamp-3">
+              增长主要来自于不断地进入新市场、开拓新渠道。只要渠道足够多，销量自然就上去了。
+            </p>
+
+            <div className="flex flex-col gap-1 mt-auto pt-4 border-t border-slate-700/50">
+              {[
+                "标准化大单品 · 规模化走量",
+                "开拓网点 · 比拼覆盖数量",
+                "大面积投放 · 考核进货量"
+              ].map((text, i) => (
+                <div key={i} className="flex items-center gap-3 py-2.5 xl:py-3 group/item">
+                  <span className="text-slate-600 font-bold text-xs lg:text-sm font-mono tracking-wider">0{i+1}</span>
+                  <span className="text-slate-400 text-[12px] lg:text-[13px] xl:text-[14px] font-medium group-hover/item:text-slate-300 transition-colors">{text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* BUSINESS SHIFT Box (Glowing transition) */}
+          <div className="w-full md:w-[140px] lg:w-[160px] xl:w-[180px] flex-shrink-0 rounded-[1.5rem] lg:rounded-[2rem] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1853FF]/10 to-cyan-500/10 border border-[#1853FF]/20 rounded-[1.5rem] lg:rounded-[2rem] backdrop-blur-md"></div>
+            
+            {/* Pulsing glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-[#1853FF]/40 blur-xl rounded-full pointer-events-none animate-pulse"></div>
+            
+            <div className="text-[10px] lg:text-[11px] font-bold text-blue-400 tracking-widest mb-4 xl:mb-6 uppercase relative z-10 drop-shadow-sm">BUSINESS SHIFT</div>
+            <div className="text-[22px] lg:text-[26px] xl:text-[32px] font-black text-white leading-[1.1] mb-6 xl:mb-8 flex flex-col relative z-10 tracking-tight drop-shadow-md">
+              <span>经营</span>
+              <span>拐点</span>
+            </div>
+            
+            <div className="relative z-10 w-10 h-10 rounded-full bg-blue-500/20 border border-blue-400/30 flex items-center justify-center mb-6 xl:mb-8 shadow-[0_0_15px_rgba(24,83,255,0.4)]">
+               <ArrowRight className="text-blue-300 w-5 h-5" strokeWidth={2.5} />
+            </div>
+            
+            <p className="text-[10px] lg:text-[11px] text-blue-200/80 font-medium leading-relaxed relative z-10 px-2">单点流程留痕<br/>已无法解释结果</p>
+          </div>
+
+          {/* NOW Box (Vibrant, high value) */}
+          <div className="flex-[1.5] xl:flex-[1.8] border border-[#1853FF]/30 rounded-[1.5rem] lg:rounded-[2rem] p-6 xl:p-8 bg-gradient-to-br from-[#1853FF]/10 to-[#0B0F19] backdrop-blur-xl flex flex-col relative overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div className="text-[11px] lg:text-[12px] font-bold text-cyan-400 tracking-[0.1em] mb-4 xl:mb-6 uppercase flex items-center gap-2">
+               <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]"></div>
+               NOW / 存量精耕
+            </div>
+            
+            <h3 className="text-lg lg:text-[20px] xl:text-[22px] font-bold mb-3 xl:mb-4 text-white tracking-tight">
+              “挖得更深”，开始关心“每一笔投入是否有效”
+            </h3>
+            
+            <p className="text-slate-300 text-[13px] lg:text-[14px] leading-relaxed mb-6 xl:mb-8 line-clamp-3">
+              产品场景化、渠道碎片化、促销高频化，让执行、费用、销售与库存必须在同一活动对象上被持续解释。
+            </p>
+
+            <div className="flex flex-col lg:flex-row gap-6 xl:gap-8 mt-auto relative z-10">
+              {/* Left list */}
+              <div className="flex flex-col gap-1 flex-1 justify-end pb-1 lg:pb-2 border-t border-white/10 lg:border-t-0 lg:border-l lg:pl-6 pt-4 lg:pt-0">
+                {[
+                  "场景化产品矩阵 · 单店效益优先",
+                  "运营存量网点 · 看重终端执行",
+                  "费用精准落地 · 考核终端动销"
+                ].map((text, i) => (
+                  <div key={i} className="flex items-center gap-3 py-2.5 xl:py-3 group/item">
+                    <span className="text-blue-500/50 font-bold text-xs lg:text-sm font-mono tracking-wider group-hover/item:text-blue-400 transition-colors">0{i+1}</span>
+                    <span className="text-slate-200 font-medium text-[12px] lg:text-[13px] xl:text-[14px]">{text}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Right questions box */}
+              <div className="flex-[1.2] bg-slate-900/60 rounded-[1.25rem] xl:rounded-[1.5rem] p-5 xl:p-6 border border-white/10 shadow-inner">
+                <div className="text-[11px] lg:text-[12px] text-slate-400 mb-4 xl:mb-5 font-semibold tracking-wide">系统必须回答的 4 个问题</div>
+                <div className="flex flex-col gap-1">
+                  {[
+                    "费用是否真正落到目标门店？",
+                    "进货增长是否只是渠道库存？",
+                    "执行是否形成有效覆盖与动销？",
+                    "举证、核销与 ROI 能否互相解释？"
+                  ].map((text, i) => (
+                    <div key={i} className="flex items-start gap-2.5 py-2 xl:py-2.5 border-b border-white/5 last:border-0">
+                      <span className="text-cyan-500/80 font-bold text-[11px] lg:text-[12px] mt-0.5 font-mono">0{i+1}</span>
+                      <span className="text-slate-300 text-[11px] lg:text-[12px] xl:text-[13px] font-medium leading-snug pt-0.5">{text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </motion.div>
+  );
+}

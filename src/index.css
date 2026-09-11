@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar,
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar,
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Presentation Canvas Zero-Scrollbar Guarantee */
+[style*="aspect-ratio: 16/9"],
+[style*="aspect-ratio:16/9"] {
+  overflow: hidden !important;
+}
+
+[style*="aspect-ratio: 16/9"] *::-webkit-scrollbar,
+[style*="aspect-ratio:16/9"] *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+[style*="aspect-ratio: 16/9"] *,
+[style*="aspect-ratio:16/9"] * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
