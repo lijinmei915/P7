@@ -8,7 +8,7 @@ export default function CoverPage() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute inset-0 w-full h-full bg-[#0A0D14] text-white p-5 sm:p-7 md:p-8 lg:p-10 xl:p-12 flex flex-col justify-between overflow-hidden rounded-[2rem] lg:rounded-[3rem] font-sans selection:bg-[#5B89FF] selection:text-black"
+      className="absolute inset-0 w-full h-full bg-[var(--slide-dark)] text-white p-5 sm:p-7 md:p-8 lg:p-10 xl:p-12 flex flex-col justify-between overflow-hidden rounded-[2rem] lg:rounded-[3rem] font-sans selection:bg-[#5B89FF] selection:text-black"
     >
       {/* Background Subtle Grain */}
       <div 
@@ -30,7 +30,7 @@ export default function CoverPage() {
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-[40%] right-[10%] w-[40%] h-[60%] rounded-full bg-[#8B5CF6]/10 blur-[120px]"
         />
-        <div className="absolute inset-0 bg-[#0A0D14]/40 backdrop-blur-[50px] z-10"></div>
+        <div className="absolute inset-0 bg-[var(--slide-dark)]/40 backdrop-blur-[50px] z-10"></div>
       </div>
 
 
@@ -68,8 +68,8 @@ export default function CoverPage() {
             >
               <div className="absolute left-0 top-1 bottom-1 w-[2px] bg-gradient-to-b from-[#5B89FF] to-transparent"></div>
               <p className="text-base sm:text-lg lg:text-xl xl:text-2xl font-light leading-relaxed text-white/90 tracking-wide">
-                 “以系统化思维解构复杂业务，<br/>
-                 <span className="text-white/40">在商业目标与用户体验间构建平衡解法。”</span>
+                 于复杂之中，建立秩序。<br/>
+                 <span className="text-white/65">于人与业务之间，设计连接。</span>
               </p>
             </motion.div>
          </div>
@@ -130,16 +130,18 @@ export default function CoverPage() {
         className="flex flex-col sm:flex-row justify-between items-start sm:items-end w-full pt-3 lg:pt-4 border-t border-white/10 z-20 shrink-0"
       >
          <div className="mb-2 sm:mb-0">
-            <div className="text-xl lg:text-2xl font-bold tracking-[0.2em] mb-1 text-white">李金梅</div>
-            <div className="text-[11px] lg:text-[12px] tracking-[0.15em] text-white/50 uppercase flex items-center gap-2.5">
-               <span className="text-[#5B89FF]">资深体验设计 / 10 YRS</span>
-               <span className="w-1 h-1 bg-white/20 rounded-full"></span>
+            <div className="text-xl lg:text-2xl font-bold tracking-[0.12em] mb-1.5 text-white">李金梅</div>
+            <div className="text-[11px] lg:text-[12px] tracking-[0.06em] text-white/65 flex flex-wrap items-center gap-x-2.5 gap-y-1">
+               <span className="text-[#7EA2FF]">资深体验设计师</span>
+               <span aria-hidden="true" className="text-white/25">/</span>
+               <span>10 年经验</span>
+               <span aria-hidden="true" className="text-white/25">/</span>
                <span>B2B & SaaS</span>
             </div>
          </div>
-         <div className="flex flex-wrap gap-2 lg:gap-2.5">
-            {['0-1 系统搭建', '复杂系统重构', '多端场景', 'AI 交互范式'].map(tag => (
-               <span key={tag} className="px-3 py-1 lg:px-4 lg:py-1.5 rounded-full border border-white/15 bg-white/5 text-[11px] lg:text-[12px] tracking-[0.1em] font-light text-white/70">
+         <div className="flex flex-wrap items-center gap-y-2 pb-0.5 sm:pl-6">
+            {['系统搭建', '复杂系统重构', '跨端体验', 'AI 体验探索'].map(tag => (
+               <span key={tag} className="px-3 lg:px-4 first:pl-0 last:pr-0 border-l first:border-l-0 border-white/20 text-[11px] lg:text-[12px] leading-none tracking-[0.08em] font-light text-white/70 whitespace-nowrap">
                  {tag}
                </span>
             ))}

@@ -38,7 +38,7 @@ export default function PresenterTimer() {
       <div className="flex items-center gap-1">
         <button 
           onClick={() => setIsRunning(!isRunning)}
-          className={`p-1.5 rounded-full transition-all ${isRunning ? 'bg-[#1853FF] text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-700'}`}
+          className={`p-1.5 rounded-full transition-all ${isRunning ? 'bg-[var(--color-primary)] text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-700'}`}
         >
           {isRunning ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 ml-0.5 fill-current" />}
         </button>

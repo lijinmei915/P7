@@ -12,14 +12,14 @@ export default function DirectoryPage({ onNavigate, activeId = '01' }: { onNavig
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 relative z-10 h-full w-full overflow-hidden select-none"
+      className="deck-page flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 relative z-10 h-full w-full overflow-hidden select-none"
     >
       {/* Header */}
       <header className="flex justify-between items-center z-10 relative shrink-0">
         <div className="flex items-center gap-4">
           <div className="flex -space-x-1.5 shadow-sm">
-            <div className="w-5 h-5 rounded-full bg-[#1853FF] relative z-10 ring-2 ring-[#F4F6FB]" />
-            <div className="w-5 h-5 rounded-full bg-[#00D084] ring-2 ring-[#F4F6FB]" />
+            <div className="w-5 h-5 rounded-full bg-[var(--color-primary)] relative z-10 ring-2 ring-[var(--slide-bg)]" />
+            <div className="w-5 h-5 rounded-full bg-[#00D084] ring-2 ring-[var(--slide-bg)]" />
           </div>
           <h1 className="text-[14px] font-black tracking-[0.2em] text-gray-800 uppercase mt-0.5">
             SANGEANLI / 三个案例
@@ -33,7 +33,7 @@ export default function DirectoryPage({ onNavigate, activeId = '01' }: { onNavig
       </header>
 
       {/* Cards Grid - Centered comfortably without stretching full height */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 xl:gap-8 my-auto z-10 relative w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 xl:gap-10 my-auto z-10 relative w-full max-w-[1040px] xl:max-w-[1160px] mx-auto">
         {cases.map((item, index) => {
           const Icon = item.icon;
           return (

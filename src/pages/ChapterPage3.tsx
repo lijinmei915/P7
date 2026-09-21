@@ -29,7 +29,7 @@ export default function ChapterPage3() {
             <div className="relative z-10 pt-2">
               <div className="flex items-center gap-3 mb-5 lg:mb-6">
                 <div className="w-8 lg:w-10 h-[2px] bg-violet-500 shadow-[0_0_12px_rgba(139,92,246,0.4)]"></div>
-                <div className="text-violet-600 font-bold tracking-[0.25em] text-[10px] md:text-xs uppercase drop-shadow-xs">
+                <div className="text-violet-600 font-bold tracking-[0.25em] text-[11px] md:text-xs uppercase drop-shadow-xs">
                   CASE 03 / GENERATIVE UI & COMPONENTS
                 </div>
               </div>
@@ -46,11 +46,11 @@ export default function ChapterPage3() {
               </p>
 
               <div className="flex gap-3">
-                 <div className="flex items-center gap-2 text-[10.5px] lg:text-xs font-bold text-violet-700 tracking-wider uppercase border border-violet-200 px-3 py-1.5 rounded-full bg-violet-50 shadow-xs">
+                 <div className="flex items-center gap-2 text-[11px] lg:text-xs font-bold text-violet-700 tracking-wider uppercase border border-violet-200 px-3 py-1.5 rounded-full bg-violet-50 shadow-xs">
                     <Layers className="w-3 h-3" />
                     <span>原子化设计</span>
                  </div>
-                 <div className="flex items-center gap-2 text-[10.5px] lg:text-xs font-bold text-blue-700 tracking-wider uppercase border border-blue-200 px-3 py-1.5 rounded-full bg-blue-50 shadow-xs">
+                 <div className="flex items-center gap-2 text-[11px] lg:text-xs font-bold text-blue-700 tracking-wider uppercase border border-blue-200 px-3 py-1.5 rounded-full bg-blue-50 shadow-xs">
                     <Cpu className="w-3 h-3" />
                     <span>动态渲染</span>
                  </div>
@@ -99,7 +99,7 @@ export default function ChapterPage3() {
                   <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 z-0"></div>
                   
                   {/* Code Tags Overlay (Abstract Concept) */}
-                  <div className="absolute top-4 right-4 bg-blue-50 text-blue-600 text-[9px] font-mono font-bold px-2 py-1 rounded border border-blue-100 shadow-sm z-20 flex items-center gap-1">
+                  <div className="absolute top-4 right-4 bg-blue-50 text-blue-600 text-[11px] font-mono font-bold px-2 py-1 rounded border border-blue-100 shadow-sm z-20 flex items-center gap-1">
                      <Code2 className="w-3 h-3" />
                      <span>{'<TaskFlow />'}</span>
                   </div>
@@ -120,13 +120,13 @@ export default function ChapterPage3() {
                         {/* Step 1 */}
                         <div className="flex items-start gap-3">
                            <div className="w-6 h-6 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center shrink-0 mt-0.5">
-                              <span className="text-[10px] font-black">1</span>
+                              <span className="text-[11px] font-black">1</span>
                            </div>
                            <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3">
                               <div className="text-xs font-bold text-slate-700 mb-2">陈列标准确认</div>
                               <div className="flex gap-2">
-                                 <div className="flex-1 h-8 bg-white border border-slate-200 rounded-lg flex items-center px-3 text-[10px] text-slate-400">拍照上传主货架</div>
-                                 <div className="flex-1 h-8 bg-white border border-slate-200 rounded-lg flex items-center px-3 text-[10px] text-slate-400">系统自动核验</div>
+                                 <div className="flex-1 h-8 bg-white border border-slate-200 rounded-lg flex items-center px-3 text-[11px] text-slate-400">拍照上传主货架</div>
+                                 <div className="flex-1 h-8 bg-white border border-slate-200 rounded-lg flex items-center px-3 text-[11px] text-slate-400">系统自动核验</div>
                               </div>
                            </div>
                         </div>
@@ -134,11 +134,11 @@ export default function ChapterPage3() {
                         {/* Step 2 */}
                         <div className="flex items-start gap-3">
                            <div className="w-6 h-6 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shrink-0 mt-0.5">
-                              <span className="text-[10px] font-black">2</span>
+                              <span className="text-[11px] font-black">2</span>
                            </div>
                            <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 opacity-70">
                               <div className="text-xs font-bold text-slate-700 mb-2">竞品数据采集</div>
-                              <div className="w-full h-8 bg-white border border-slate-200 rounded-lg flex items-center px-3 text-[10px] text-slate-400">录入核心竞品价格与陈列面</div>
+                              <div className="w-full h-8 bg-white border border-slate-200 rounded-lg flex items-center px-3 text-[11px] text-slate-400">录入核心竞品价格与陈列面</div>
                            </div>
                         </div>
                      </div>
@@ -161,7 +161,7 @@ export default function ChapterPage3() {
                   <CheckCircle2 className="w-4 h-4" />
                </div>
                <div>
-                  <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Efficiency</div>
+                  <div className="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Efficiency</div>
                   <div className="text-sm font-black text-slate-800">配置时间 -85%</div>
                </div>
             </motion.div>

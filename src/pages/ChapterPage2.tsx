@@ -29,7 +29,7 @@ export default function ChapterPage2() {
             <div className="relative z-10 pt-2">
               <div className="flex items-center gap-3 mb-5 lg:mb-6">
                 <div className="w-8 lg:w-10 h-[2px] bg-[#00F0FF] shadow-[0_0_12px_rgba(0,240,255,0.6)]"></div>
-                <div className="text-[#00F0FF] font-bold tracking-[0.25em] text-[10px] md:text-xs uppercase drop-shadow-xs">
+                <div className="text-[#00F0FF] font-bold tracking-[0.25em] text-[11px] md:text-xs uppercase drop-shadow-xs">
                   CASE 02 / LIVEBOARD & REPORT
                 </div>
               </div>
@@ -46,11 +46,11 @@ export default function ChapterPage2() {
               </p>
 
               <div className="flex gap-3">
-                 <div className="flex items-center gap-2 text-[10.5px] lg:text-xs font-bold text-slate-400 tracking-wider uppercase border border-white/10 px-3 py-1.5 rounded-full bg-white/5">
+                 <div className="flex items-center gap-2 text-[11px] lg:text-xs font-bold text-slate-400 tracking-wider uppercase border border-white/10 px-3 py-1.5 rounded-full bg-white/5">
                     <Sparkles className="w-3 h-3 text-[#7B61FF]" />
                     <span>Agent 驱动</span>
                  </div>
-                 <div className="flex items-center gap-2 text-[10.5px] lg:text-xs font-bold text-slate-400 tracking-wider uppercase border border-white/10 px-3 py-1.5 rounded-full bg-white/5">
+                 <div className="flex items-center gap-2 text-[11px] lg:text-xs font-bold text-slate-400 tracking-wider uppercase border border-white/10 px-3 py-1.5 rounded-full bg-white/5">
                     <BarChart3 className="w-3 h-3 text-[#00F0FF]" />
                     <span>动态可视化</span>
                  </div>
@@ -66,7 +66,7 @@ export default function ChapterPage2() {
             {/* Center Main Dashboard */}
             <motion.div 
               initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[360px] bg-[#0A0D14]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_40px_80px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[360px] bg-[var(--slide-dark)]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_40px_80px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col"
             >
                {/* Dashboard Header */}
                <div className="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-white/[0.02]">
@@ -103,11 +103,11 @@ export default function ChapterPage2() {
                         </div>
                         {/* Dynamic Chart Area */}
                         <div className="h-40 w-full border border-white/10 rounded-xl bg-black/20 p-4 flex items-end gap-3 justify-between relative overflow-hidden">
-                           <div className="absolute top-3 left-4 text-[10px] text-slate-500 font-bold uppercase tracking-wider">Revenue by Province</div>
+                           <div className="absolute top-3 left-4 text-[11px] text-slate-500 font-bold uppercase tracking-wider">Revenue by Province</div>
                            {/* Chart Bars */}
                            {[60, 45, 90, 75, 50, 85].map((val, i) => (
                               <div key={i} className="w-full flex justify-center group relative h-full">
-                                 <div className="absolute -top-5 text-[9px] font-bold text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">{val}k</div>
+                                 <div className="absolute -top-5 text-[11px] font-bold text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">{val}k</div>
                                  <div 
                                     className={`w-full rounded-t-sm h-[${val}%] mt-auto transition-all duration-300 ${
                                       i === 1 ? 'bg-rose-500/80 shadow-[0_0_15px_rgba(244,63,94,0.4)] border-t border-rose-400' : 'bg-[#00F0FF]/60 hover:bg-[#00F0FF]/80 hover:shadow-[0_0_15px_rgba(0,240,255,0.4)]'
@@ -133,7 +133,7 @@ export default function ChapterPage2() {
                   </div>
                   <span className="text-white text-[11px] font-bold">智能归因</span>
                </div>
-               <div className="text-[10px] text-slate-400 leading-snug">
+               <div className="text-[11px] text-slate-400 leading-snug">
                   发现 <span className="text-rose-400 font-bold">3 个</span> 异动因子，影响销售额约 12.5%。已生成根因树。
                </div>
             </motion.div>
@@ -144,14 +144,14 @@ export default function ChapterPage2() {
               className="absolute bottom-[5%] -right-[5%] bg-slate-900/80 backdrop-blur-md p-4 rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.6)] border border-[#00F0FF]/30 w-52 z-30"
             >
                <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
-                  <span className="text-[#00F0FF] text-[10px] font-bold tracking-widest uppercase">KPI Forecast</span>
+                  <span className="text-[#00F0FF] text-[11px] font-bold tracking-widest uppercase">KPI Forecast</span>
                   <LineChart className="w-3.5 h-3.5 text-[#00F0FF]" />
                </div>
                <div className="flex items-baseline gap-2 mb-1">
                   <span className="text-2xl font-black text-white leading-none">94.2</span>
-                  <span className="text-[10px] text-[#00F0FF] font-bold">+2.4%</span>
+                  <span className="text-[11px] text-[#00F0FF] font-bold">+2.4%</span>
                </div>
-               <div className="text-[9px] text-slate-500">基于历史数据的下月预测</div>
+               <div className="text-[11px] text-slate-500">基于历史数据的下月预测</div>
                
                {/* Sparkline fake */}
                <div className="mt-3 flex items-end gap-1 h-6">

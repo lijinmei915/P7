@@ -1,0 +1,40 @@
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const assert = require('node:assert/strict');
+(async()=>{
+ const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+ const context=await browser.newContext({viewport:{width:1741,height:1100},permissions:['clipboard-read','clipboard-write']});
+ const page=await context.newPage();
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://localhost:3000');await page.evaluate(()=>sessionStorage.setItem('p7-current-page','persona'));await page.reload();
+ await page.getByRole('button',{name:'设计规范',exact:true}).click();
+ const cards=page.locator('[data-design-card]');
+ for(let i=0;i<2;i++){
+  await cards.nth(i).click({position:{x:10,y:10}});
+  await page.getByLabel('宽度模式',{exact:true}).selectOption('fixed');
+  await page.getByLabel('自定义宽度（px）',{exact:true}).fill('350');
+  await page.getByRole('button',{name:'存为规范并应用',exact:true}).click();
+ }
+ await page.getByRole('button',{name:'规范库',exact:true}).click();
+ await page.locator('details.element-editor > summary').click();
+ await page.getByLabel('查找规范',{exact:true}).fill('自定义尺寸 350');
+ const row=page.locator('.library-row').filter({hasText:'自定义尺寸 350'});
+ assert.match(await row.textContent(),/已绑定 1 页 · 2 个元素/);
+ await row.locator('summary').click();await row.getByRole('button',{name:'高亮本页引用'}).click();
+ assert.equal(await page.locator('[data-rule-highlight]').count(),2);
+ await row.getByRole('button',{name:'修改',exact:true}).click();
+ assert.match(await page.locator('.design-impact').textContent(),/1 页、2 个元素/);
+ await page.getByLabel('规范数值',{exact:true}).fill('360');
+ await page.getByRole('button',{name:'保存规范并联动'}).click();await page.waitForTimeout(400);
+ for(let i=0;i<2;i++) assert.ok(Math.abs(parseFloat(await cards.nth(i).evaluate(e=>getComputedStyle(e).width))-360)<1);
+ await page.getByRole('button',{name:'撤销',exact:true}).click();await page.waitForTimeout(400);
+ for(let i=0;i<2;i++) assert.ok(Math.abs(parseFloat(await cards.nth(i).evaluate(e=>getComputedStyle(e).width))-350)<1);
+ await page.getByRole('button',{name:'复制改动发给 AI'}).click();
+ assert.match(await page.evaluate(()=>navigator.clipboard.readText()),/元素规范引用/);
+ await page.locator('.handoff-summary > summary').click();
+ assert.match(await page.locator('.handoff-summary').textContent(),/宽度：自定义尺寸 350px/);
+ const footer=await page.locator('.design-fixed-footer').boundingBox();assert.ok(footer.y+footer.height<=1100);
+ const header=await page.locator('.design-fixed-heading').boundingBox();assert.ok(header.y>=0);
+ await page.screenshot({path:'/tmp/p7-editor-check/library.png'});
+ assert.deepEqual(errors,[]);console.log('PASS: shared impact, highlighting, two-element update, undo, clipboard, summary, fixed header/footer');
+ await browser.close();
+})();

@@ -112,7 +112,7 @@ const columns = [
 
 const Row = ({ title, isFlex, children, isRelative, className = "" }: any) => (
   <div className={`flex border-b border-slate-200 last:border-0 ${isFlex ? 'flex-1 min-h-0' : 'shrink-0'} ${className}`}>
-    <div className="w-[60px] lg:w-[80px] xl:w-[90px] shrink-0 bg-[#101014] text-white flex items-center justify-center p-1 lg:p-2 text-center text-[7px] lg:text-[8px] font-black tracking-widest break-words leading-tight">
+    <div className="w-[60px] lg:w-[80px] xl:w-[90px] shrink-0 bg-[#101014] text-white flex items-center justify-center p-1 lg:p-2 text-center text-[11px] lg:text-[11px] font-black tracking-widest break-words leading-tight">
       {title}
     </div>
     <div className={`flex flex-1 ${isRelative ? 'relative' : ''}`}>
@@ -138,12 +138,12 @@ export default function UserJourneyPage({ onBack }: { onBack?: () => void }) {
           onClick={onBack}
         >
           <div className="flex -space-x-1.5 shadow-sm group-hover:scale-110 transition-transform">
-            <div className="w-5 h-5 rounded-full bg-[#1853FF] relative z-10 ring-2 ring-[#F4F6FB]" />
-            <div className="w-5 h-5 rounded-full bg-[#00D084] ring-2 ring-[#F4F6FB]" />
+            <div className="w-5 h-5 rounded-full bg-[var(--color-primary)] relative z-10 ring-2 ring-[var(--slide-bg)]" />
+            <div className="w-5 h-5 rounded-full bg-[#00D084] ring-2 ring-[var(--slide-bg)]" />
           </div>
           <h1 className="text-[14px] font-black tracking-[0.2em] text-gray-800 uppercase mt-0.5 flex items-center">
-            {onBack && <ChevronLeft className="w-4 h-4 mr-1 opacity-0 group-hover:opacity-100 transition-all -ml-5 group-hover:ml-0 text-[#1853FF]" strokeWidth={3} />}
-            <span className="group-hover:text-[#1853FF] transition-colors">02. 调研分析与机会挖掘</span>
+            {onBack && <ChevronLeft className="w-4 h-4 mr-1 opacity-0 group-hover:opacity-100 transition-all -ml-5 group-hover:ml-0 text-[var(--color-primary)]" strokeWidth={3} />}
+            <span className="group-hover:text-[var(--color-primary)] transition-colors">02. 调研分析与机会挖掘</span>
           </h1>
         </div>
         <div className="hidden md:flex items-center gap-3">
@@ -168,9 +168,9 @@ export default function UserJourneyPage({ onBack }: { onBack?: () => void }) {
          <Row title="工作阶段">
             {columns.map((c, i) => (
                <div key={i} className="flex-1 border-r border-slate-200 last:border-0 p-1.5 lg:p-2 flex flex-col justify-center">
-                  <div className="text-yellow-600 font-black text-[9px] lg:text-[10px] mb-0.5">{c.time}</div>
-                  <div className="font-black text-slate-800 text-[10px] lg:text-xs xl:text-sm mb-0.5 leading-tight">{c.title}</div>
-                  <div className="text-[7px] lg:text-[8px] xl:text-[8.5px] text-slate-400 leading-tight">{c.context}</div>
+                  <div className="text-yellow-600 font-black text-[11px] lg:text-[11px] mb-0.5">{c.time}</div>
+                  <div className="font-black text-slate-800 text-[11px] lg:text-xs xl:text-sm mb-0.5 leading-tight">{c.title}</div>
+                  <div className="text-[11px] lg:text-[11px] xl:text-[11px] text-slate-400 leading-tight">{c.context}</div>
                </div>
             ))}
          </Row>
@@ -179,7 +179,7 @@ export default function UserJourneyPage({ onBack }: { onBack?: () => void }) {
          <Row title="此刻想完成什么">
             {columns.map((c, i) => (
                <div key={i} className="flex-1 border-r border-slate-200 last:border-0 p-1.5 lg:p-2 flex items-center bg-slate-50/50">
-                  <div className="font-bold text-slate-800 text-[7.5px] lg:text-[8.5px] xl:text-[9.5px] leading-snug">
+                  <div className="font-bold text-slate-800 text-[11px] lg:text-[11px] xl:text-[11px] leading-snug">
                      {c.goal}
                   </div>
                </div>
@@ -190,8 +190,8 @@ export default function UserJourneyPage({ onBack }: { onBack?: () => void }) {
          <Row title="实际行为与判断" isFlex>
             {columns.map((c, i) => (
                <div key={i} className="flex-1 border-r border-slate-200 last:border-0 p-1.5 lg:p-2 flex flex-col min-h-0 overflow-hidden justify-center">
-                  <div className="text-[7.5px] lg:text-[8.5px] xl:text-[9px] text-slate-700 font-bold leading-snug mb-1">{c.action}</div>
-                  <ul className="list-disc pl-3 text-[6.5px] lg:text-[7.5px] xl:text-[8px] text-slate-500 space-y-0.5">
+                  <div className="text-[11px] lg:text-[11px] xl:text-[11px] text-slate-700 font-bold leading-snug mb-1">{c.action}</div>
+                  <ul className="list-disc pl-3 text-[11px] lg:text-[11px] xl:text-[11px] text-slate-500 space-y-0.5">
                      {c.bullets.map((b, j) => <li key={j}>{b}</li>)}
                   </ul>
                </div>
@@ -203,7 +203,7 @@ export default function UserJourneyPage({ onBack }: { onBack?: () => void }) {
             {columns.map((c, i) => (
                <div key={i} className="flex-1 border-r border-slate-200 last:border-0 p-1.5 flex flex-wrap content-center gap-1 bg-slate-50/50">
                   {c.touchpoints.map((t, j) => (
-                     <span key={j} className="border border-slate-200 text-slate-500 bg-white px-1.5 py-0.5 rounded text-[6px] lg:text-[7px] xl:text-[8px] font-medium">{t}</span>
+                     <span key={j} className="border border-slate-200 text-slate-500 bg-white px-1.5 py-0.5 rounded text-[11px] lg:text-[11px] xl:text-[11px] font-medium">{t}</span>
                   ))}
                </div>
             ))}
@@ -232,7 +232,7 @@ export default function UserJourneyPage({ onBack }: { onBack?: () => void }) {
             {/* Text Layer */}
             {columns.map((c, i) => (
                <div key={i} className="flex-1 border-r border-slate-200 last:border-0 px-1.5 pb-1 pt-[25px] lg:pt-[35px] xl:pt-[45px] flex flex-col justify-end z-10">
-                  <div className="text-[6.5px] lg:text-[7.5px] xl:text-[8px] text-slate-600 leading-tight font-medium bg-white/90 backdrop-blur-sm rounded px-1 py-0.5">{c.emotionText}</div>
+                  <div className="text-[11px] lg:text-[11px] xl:text-[11px] text-slate-600 leading-tight font-medium bg-white/90 backdrop-blur-sm rounded px-1 py-0.5">{c.emotionText}</div>
                </div>
             ))}
          </Row>
@@ -241,13 +241,13 @@ export default function UserJourneyPage({ onBack }: { onBack?: () => void }) {
          <Row title="观察证据与原话">
             {columns.map((c, i) => (
                <div key={i} className="flex-1 border-r border-slate-200 last:border-0 p-1.5 lg:p-2 flex flex-col justify-between gap-1.5">
-                  <div className="bg-[#101014] text-white p-1.5 rounded text-[7px] lg:text-[7.5px]">
-                     <div className="text-yellow-400 font-bold mb-0.5 tracking-wider text-[6px] lg:text-[6.5px]">{c.quoteName}</div>
+                  <div className="bg-[#101014] text-white p-1.5 rounded text-[11px] lg:text-[11px]">
+                     <div className="text-yellow-400 font-bold mb-0.5 tracking-wider text-[11px] lg:text-[11px]">{c.quoteName}</div>
                      <div className="text-white/80 leading-snug">{c.quote}</div>
                   </div>
                   <div className="flex items-start gap-1 lg:gap-1.5">
                      <div className="text-yellow-500 font-black text-xs lg:text-sm leading-none tracking-tighter w-6 lg:w-7 shrink-0">{c.statNum}</div>
-                     <div className="text-[6px] lg:text-[7px] xl:text-[7.5px] text-slate-500 leading-tight font-medium flex-1">{c.statText}</div>
+                     <div className="text-[11px] lg:text-[11px] xl:text-[11px] text-slate-500 leading-tight font-medium flex-1">{c.statText}</div>
                   </div>
                </div>
             ))}
@@ -258,48 +258,48 @@ export default function UserJourneyPage({ onBack }: { onBack?: () => void }) {
       <div className="flex gap-2.5 lg:gap-3 mt-2 lg:mt-3 shrink-0 h-[70px] lg:h-[84px] z-10">
          {/* Panel 1 */}
          <div className="w-[180px] lg:w-[220px] xl:w-[240px] bg-white border border-slate-200 p-2 lg:p-3 rounded-lg shadow-sm flex flex-col justify-center shrink-0">
-            <div className="text-yellow-600 font-black text-[6px] lg:text-[7px] xl:text-[8px] tracking-widest mb-1.5">METHOD · 研究方法</div>
-            <div className="font-black text-slate-800 text-[10px] lg:text-xs mb-2">一天影随 + 任务后回顾</div>
+            <div className="text-yellow-600 font-black text-[11px] lg:text-[11px] xl:text-[11px] tracking-widest mb-1.5">METHOD · 研究方法</div>
+            <div className="font-black text-slate-800 text-[11px] lg:text-xs mb-2">一天影随 + 任务后回顾</div>
             <div className="flex flex-wrap gap-1">
-               <span className="bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded text-[6px] lg:text-[7px] font-medium border border-slate-100">10位业代分层样本</span>
-               <span className="bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded text-[6px] lg:text-[7px] font-medium border border-slate-100">完整工作日影随</span>
-               <span className="bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded text-[6px] lg:text-[7px] font-medium border border-slate-100">行为/触点/情绪记录</span>
-               <span className="bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded text-[6px] lg:text-[7px] font-medium border border-slate-100">30分钟1V1</span>
+               <span className="bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded text-[11px] lg:text-[11px] font-medium border border-slate-100">10位业代分层样本</span>
+               <span className="bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded text-[11px] lg:text-[11px] font-medium border border-slate-100">完整工作日影随</span>
+               <span className="bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded text-[11px] lg:text-[11px] font-medium border border-slate-100">行为/触点/情绪记录</span>
+               <span className="bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded text-[11px] lg:text-[11px] font-medium border border-slate-100">30分钟1V1</span>
             </div>
          </div>
          
          {/* Panel 2 */}
          <div className="w-[240px] lg:w-[280px] xl:w-[320px] bg-white border border-slate-200 p-2 lg:p-3 rounded-lg shadow-sm flex flex-col justify-center shrink-0">
-            <div className="text-yellow-600 font-black text-[6px] lg:text-[7px] xl:text-[8px] tracking-widest mb-1.5">BEHAVIOR PATTERN · MOCK</div>
-            <div className="font-black text-slate-800 text-[9px] lg:text-[11px] mb-2">跨阶段重复出现的行为模式</div>
+            <div className="text-yellow-600 font-black text-[11px] lg:text-[11px] xl:text-[11px] tracking-widest mb-1.5">BEHAVIOR PATTERN · MOCK</div>
+            <div className="font-black text-slate-800 text-[11px] lg:text-[11px] mb-2">跨阶段重复出现的行为模式</div>
             <div className="grid grid-cols-2 gap-x-2 gap-y-1 lg:gap-y-1.5">
                <div className="flex items-center gap-1.5">
                   <span className="text-yellow-500 font-black text-xs lg:text-sm tracking-tighter">8/10</span>
-                  <span className="text-[6px] lg:text-[7px] text-slate-500 leading-tight font-medium">从多个入口被动接收任务</span>
+                  <span className="text-[11px] lg:text-[11px] text-slate-500 leading-tight font-medium">从多个入口被动接收任务</span>
                </div>
                <div className="flex items-center gap-1.5">
                   <span className="text-yellow-500 font-black text-xs lg:text-sm tracking-tighter">7/10</span>
-                  <span className="text-[6px] lg:text-[7px] text-slate-500 leading-tight font-medium">凭经验而非收益最大化排线</span>
+                  <span className="text-[11px] lg:text-[11px] text-slate-500 leading-tight font-medium">凭经验而非收益最大化排线</span>
                </div>
                <div className="flex items-center gap-1.5">
                   <span className="text-yellow-500 font-black text-xs lg:text-sm tracking-tighter">6/10</span>
-                  <span className="text-[6px] lg:text-[7px] text-slate-500 leading-tight font-medium">对奖励门槛与规则感到模糊</span>
+                  <span className="text-[11px] lg:text-[11px] text-slate-500 leading-tight font-medium">对奖励门槛与规则感到模糊</span>
                </div>
                <div className="flex items-center gap-1.5">
                   <span className="text-yellow-500 font-black text-xs lg:text-sm tracking-tighter">8/10</span>
-                  <span className="text-[6px] lg:text-[7px] text-slate-500 leading-tight font-medium">认为日常提交仅是机械交差</span>
+                  <span className="text-[11px] lg:text-[11px] text-slate-500 leading-tight font-medium">认为日常提交仅是机械交差</span>
                </div>
             </div>
          </div>
 
          {/* Panel 3 */}
          <div className="flex-1 bg-[#101014] text-white p-3 lg:p-4 rounded-lg shadow-xl flex flex-col justify-center min-w-0">
-            <div className="text-yellow-400 font-black text-[6px] lg:text-[7px] xl:text-[8px] tracking-widest mb-1.5">PRE-SOLUTION INSIGHT · 待交叉验证</div>
+            <div className="text-yellow-400 font-black text-[11px] lg:text-[11px] xl:text-[11px] tracking-widest mb-1.5">PRE-SOLUTION INSIGHT · 待交叉验证</div>
             <div className="font-black text-xs lg:text-sm mb-2">优化前洞察</div>
-            <div className="text-[8px] lg:text-[9.5px] xl:text-[11px] text-white/90 leading-relaxed font-bold mb-2">
+            <div className="text-[11px] lg:text-[11px] xl:text-[11px] text-white/90 leading-relaxed font-bold mb-2">
                目前的执行链路充满阻力且极度<span className="text-yellow-400">缺乏正向刺激</span>。在规则模糊与滞后反馈的消耗下，业代逐渐沦为<span className="text-yellow-400">“机械交差”</span>，微弱且延迟的激励完全无法驱动他们追求“高质量完成”。
             </div>
-            <div className="border-t border-white/10 pt-1.5 text-[6px] lg:text-[7px] text-white/40">
+            <div className="border-t border-white/10 pt-1.5 text-[11px] lg:text-[11px] text-white/40">
                验证边界：下一页单独放大“一次到店作业”。本页不提出产品功能，仅与运营的活动配置、检核记录和驳回原因进行交叉验证。
             </div>
          </div>

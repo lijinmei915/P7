@@ -17,9 +17,9 @@ export interface StandardPageLayoutProps {
 
 /**
  * Standard content page layout following the exact PPT specification:
- * - Pure synchronized canvas background (#F4F6FB + AmbientBackground)
+ * - Pure synchronized canvas background (var(--slide-bg) + AmbientBackground)
  * - Standardized responsive padding: p-5 sm:p-6 md:p-7 lg:p-8 xl:p-9 (calibrated for 16:9 presentation canvas)
- * - Standard double-circle icon (Blue #1853FF + Green #00D084)
+ * - Standard double-circle icon (Blue var(--color-primary) + Green #00D084)
  * - Standard phase typography: text-[14px] font-black tracking-[0.2em] uppercase
  * - Standard title typography & layout rule: 
  *   标题在有空间时坚决不折行 (whitespace-normal lg:whitespace-nowrap)，不设死 max-w 约束，保持横向延伸气场
@@ -47,7 +47,7 @@ export default function StandardPageLayout({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className={`flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 flex-1 relative z-10 h-full w-full overflow-hidden select-none ${className}`}
+      className={`deck-page flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 flex-1 relative z-10 h-full w-full overflow-hidden select-none ${className}`}
     >
       {/* Header - Standard Specification */}
       <header className="flex justify-between items-center z-10 relative mb-3.5 lg:mb-5 shrink-0">
@@ -56,17 +56,17 @@ export default function StandardPageLayout({
           onClick={onBack}
         >
           <div className="flex -space-x-1.5 shadow-sm group-hover:scale-110 transition-transform">
-            <div className="w-5 h-5 rounded-full bg-[#1853FF] relative z-10 ring-2 ring-[#F4F6FB]" />
-            <div className="w-5 h-5 rounded-full bg-[#00D084] ring-2 ring-[#F4F6FB]" />
+            <div className="w-5 h-5 rounded-full bg-[var(--color-primary)] relative z-10 ring-2 ring-[var(--slide-bg)]" />
+            <div className="w-5 h-5 rounded-full bg-[#00D084] ring-2 ring-[var(--slide-bg)]" />
           </div>
           <h1 className="text-[14px] font-black tracking-[0.2em] text-gray-800 uppercase mt-0.5 flex items-center">
             {onBack && (
               <ChevronLeft
-                className="w-4 h-4 mr-1 opacity-0 group-hover:opacity-100 transition-all -ml-5 group-hover:ml-0 text-[#1853FF]"
+                className="w-4 h-4 mr-1 opacity-0 group-hover:opacity-100 transition-all -ml-5 group-hover:ml-0 text-[var(--color-primary)]"
                 strokeWidth={3}
               />
             )}
-            <span className="group-hover:text-[#1853FF] transition-colors">
+            <span className="group-hover:text-[var(--color-primary)] transition-colors">
               {phaseTitle}
             </span>
           </h1>

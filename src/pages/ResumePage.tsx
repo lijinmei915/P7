@@ -8,7 +8,7 @@ export default function ResumePage() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute inset-0 w-full h-full bg-[#0A0D14] text-white overflow-hidden rounded-[2rem] lg:rounded-[3rem] font-sans selection:bg-[#5B89FF] selection:text-black flex"
+      className="resume-page absolute inset-0 w-full h-full bg-[var(--slide-dark)] text-white overflow-hidden rounded-[2rem] lg:rounded-[3rem] font-sans selection:bg-[#5B89FF] selection:text-black flex"
     >
       {/* Cinematic Noise Texture */}
       <div 
@@ -30,7 +30,7 @@ export default function ResumePage() {
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-[40%] right-[10%] w-[40%] h-[60%] rounded-full bg-[#8B5CF6]/10 blur-[120px]"
         />
-        <div className="absolute inset-0 bg-[#0A0D14]/40 backdrop-blur-[50px] z-10"></div>
+        <div className="absolute inset-0 bg-[var(--slide-dark)]/40 backdrop-blur-[50px] z-10"></div>
       </div>
 
       
@@ -51,33 +51,34 @@ export default function ResumePage() {
          10 YRS
       </div>
 
-      <div className="relative w-full h-full flex flex-row p-5 sm:p-7 md:p-8 lg:p-10 xl:p-12 z-20 min-h-0 gap-6 xl:gap-10 overflow-hidden select-none">
+      <div className="resume-layout relative w-full h-full flex flex-row p-5 sm:p-7 md:p-8 lg:p-10 xl:p-12 z-20 min-h-0 gap-6 xl:gap-10 overflow-hidden select-none">
          
          {/* LEFT & MIDDLE WRAPPER (To align Photo and Text exactly at the top) */}
-         <div className="flex-1 shrink-0 h-full flex flex-col justify-center min-w-0 pr-4 xl:pr-8 relative z-10">
-            <div className="flex flex-row items-start gap-8 xl:gap-12 w-full">
+         <div className="resume-left flex-1 shrink-0 h-full flex flex-col justify-center min-w-0 pr-4 xl:pr-8 relative z-10">
+            <div className="resume-columns flex flex-row items-start gap-8 xl:gap-12 w-full">
                
                {/* LEFT COLUMN (ID Photo) */}
-               <div className="hidden md:flex w-[180px] xl:w-[240px] shrink-0 flex-col pt-1.5 xl:pt-2">
+               <div className="resume-photo hidden md:flex w-[180px] xl:w-[240px] shrink-0 flex-col pt-1.5 xl:pt-2">
                   <div className="w-full aspect-[3/4] rounded-2xl bg-white/5 border border-white/10 relative overflow-hidden flex flex-col items-center justify-center backdrop-blur-sm group">
-                     <svg className="w-8 h-8 text-white/20 mb-2 group-hover:text-white/40 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                     </svg>
-                     <span className="text-[11px] text-white/30 font-mono tracking-widest group-hover:text-white/50 transition-colors">3:4 PHOTO</span>
+                     <img
+                        src="/images/li-jinmei-portrait.jpg"
+                        alt="李金梅肖像"
+                        className="absolute inset-0 w-full h-full object-cover object-center"
+                     />
                   </div>
                </div>
 
                {/* MIDDLE COLUMN (Identity + Philosophy) */}
-               <div className="flex-1 flex flex-col min-w-0">
+               <div className="resume-bio flex-1 flex flex-col min-w-0">
                   
-                  <div className="flex items-end gap-4 xl:gap-5 mb-4 xl:mb-5">
+                  <div className="resume-identity flex items-end gap-4 xl:gap-5 mb-4 xl:mb-5">
                      <h1 className="text-4xl xl:text-[3.5rem] font-bold tracking-tight text-white leading-none">李金梅</h1>
                <div className="flex items-center pb-1 xl:pb-1.5">
                   <span className="text-[14px] xl:text-[15px] text-white tracking-widest font-medium whitespace-nowrap">资深体验设计师</span>
                </div>
             </div>
             
-            <div className="flex flex-wrap gap-2 mb-6 xl:mb-8">
+            <div className="resume-tags flex flex-wrap gap-2 mb-6 xl:mb-8">
                {['责任感', '执着', '好奇心', '协作力', '持续学习'].map(tag => (
                   <span key={tag} className="px-3 py-1.5 text-[12px] xl:text-[13px] font-medium text-white/80 bg-white/10 border border-white/20 rounded-sm tracking-[0.2em] backdrop-blur-sm">
                      {tag}
@@ -85,14 +86,14 @@ export default function ResumePage() {
                ))}
             </div>
             
-            <div className="relative mt-2 xl:mt-4">
+            <div className="resume-quote relative mt-2 xl:mt-4">
               <span className="absolute -left-5 xl:-left-6 -top-5 xl:-top-7 text-[4rem] xl:text-[5rem] font-['DIN_Alternate','DIN',sans-serif] font-bold italic text-[#5B89FF]/40 leading-none pointer-events-none">“</span>
               <p className="text-[1.15rem] xl:text-2xl font-light italic leading-snug text-white/90 tracking-wide">
                 好设计不仅是美化，<span className="text-[#5B89FF]/90 font-serif">更是业务效率放大器。</span>
               </p>
             </div>
 
-            <div className="mt-8 xl:mt-10">
+            <div className="resume-description mt-8 xl:mt-10">
                <div className="text-[14px] xl:text-[16px] text-white/70 leading-[1.7] xl:leading-[1.8] tracking-wide font-light flex flex-col gap-3 xl:gap-4 max-w-[540px] xl:max-w-[640px]">
                   <div>
                      <span className="text-white font-semibold text-[15px] xl:text-[17px]">10年</span> 复杂 <strong className="text-white font-semibold">B端</strong> 产品设计经验，具备 <strong className="text-white font-semibold">全终端</strong> 设计能力 (PC网页、移动端、大屏、硬件POS等)。
@@ -103,17 +104,17 @@ export default function ResumePage() {
                </div>
             </div>
 
-            <div className="flex flex-row flex-wrap items-center gap-x-8 xl:gap-x-10 gap-y-6 mt-24 xl:mt-32">
+            <div className="resume-meta flex flex-row flex-wrap items-center gap-x-8 xl:gap-x-10 gap-y-6 mt-24 xl:mt-32">
                <MetaBlock label="Experience" value="10年" />
-               <MetaBlock label="Education" value={<>硕士 - UAB（巴塞罗那自治大学）<span className="mx-2 text-white/20">|</span>本科 - 上海师范大学</>} />
-               <MetaBlock label="Contact" value={<>185 1620 8332<span className="mx-2 text-white/20">|</span>lijinmei915@gmail.com</>} />
+               <MetaBlock label="Education" value={<><span className="block whitespace-nowrap">硕士 · UAB（巴塞罗那自治大学）</span><span className="block whitespace-nowrap">本科 · 上海师范大学</span></>} />
+               <MetaBlock label="Contact" value={<><span className="block">185 1620 8332</span><span className="block">lijinmei915@gmail.com</span></>} />
             </div>
                </div>
             </div>
          </div>
 
          {/* RIGHT COLUMN (Timeline) */}
-         <div className="w-[300px] xl:w-[380px] shrink-0 h-full flex flex-col justify-center relative min-w-0 pl-8 xl:pl-12 z-10">
+         <div className="resume-timeline w-[300px] xl:w-[380px] shrink-0 h-full flex flex-col justify-center relative min-w-0 pl-8 xl:pl-12 z-10">
             
             <div className="relative flex flex-col w-full">
                {/* Bleeding Vertical Line (Extends out to infinity) */}
@@ -171,7 +172,7 @@ function MetaBlock({ label, value }: { label: string, value: React.ReactNode }) 
 function TimelineNode({ year, company, fullCompany, desc, isActive = false }: { year: string, company: string, fullCompany?: string, desc: string, isActive?: boolean }) {
    const dotBaseClasses = "absolute left-[-3.5px] xl:left-[-4.5px] top-[1.5px] xl:top-[1px] w-2 h-2 xl:w-2.5 xl:h-2.5 rounded-full border transition-all duration-300 z-10";
    const dotActiveClasses = "bg-[#5B89FF] border-[#5B89FF] shadow-[0_0_12px_rgba(91,137,255,0.8)]";
-   const dotInactiveClasses = "bg-[#0A0D14] border-[#5B89FF]/50 group-hover:bg-[#5B89FF] group-hover:border-[#5B89FF] group-hover:shadow-[0_0_12px_rgba(91,137,255,0.8)]";
+   const dotInactiveClasses = "bg-[var(--slide-dark)] border-[#5B89FF]/50 group-hover:bg-[#5B89FF] group-hover:border-[#5B89FF] group-hover:shadow-[0_0_12px_rgba(91,137,255,0.8)]";
 
    return (
       <div className="relative flex flex-col pl-8 xl:pl-10 group cursor-default">

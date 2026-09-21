@@ -18,18 +18,32 @@ import TaskDecisionPage from './pages/TaskDecisionPage';
 import SalesRepDayPage from './pages/SalesRepDayPage';
 import OperatorStudyPage from './pages/OperatorStudyPage';
 import UserJourneyPage from './pages/UserJourneyPage';
+import RootCausePage from './pages/RootCausePage';
+import BusinessModelPage from './pages/BusinessModelPage';
+import SolutionMapPage from './pages/SolutionMapPage';
 import PresenterPanel from './components/PresenterPanel';
 import PresenterTimer from './components/PresenterTimer';
+import DesignPanel from './components/DesignPanel';
+
+const pages: Array<'cover' | 'resume' | 'directory' | 'chapter' | 'insight1' | 'insight2' | 'persona' | 'survey' | 'signal' | 'taskDecision' | 'operatorStudy' | 'userJourney' | 'rootCause' | 'bizModel' | 'solutionMap' | 'directory2' | 'chapter2' | 'directory3' | 'chapter3' | 'ending'> = ['directory', 'chapter', 'insight1', 'insight2', 'persona', 'survey', 'signal', 'taskDecision', 'operatorStudy', 'userJourney', 'rootCause', 'bizModel', 'solutionMap', 'directory2', 'chapter2', 'directory3', 'chapter3', 'ending'];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'cover' | 'resume' | 'directory' | 'chapter' | 'insight1' | 'insight2' | 'persona' | 'survey' | 'signal' | 'taskDecision' | 'directory2' | 'chapter2' | 'directory3' | 'chapter3' | 'ending'>('directory');
+  const [currentPage, setCurrentPage] = useState<'cover' | 'resume' | 'directory' | 'chapter' | 'insight1' | 'insight2' | 'persona' | 'survey' | 'signal' | 'taskDecision' | 'operatorStudy' | 'userJourney' | 'rootCause' | 'bizModel' | 'solutionMap' | 'directory2' | 'chapter2' | 'directory3' | 'chapter3' | 'ending'> (() => {
+    try {
+      const saved = sessionStorage.getItem('p7-current-page');
+      return pages.find(page => page === saved) ?? 'directory';
+    } catch { return 'directory'; }
+  });
+  useEffect(() => {
+    try { sessionStorage.setItem('p7-current-page', currentPage); } catch { /* Storage may be unavailable. */ }
+  }, [currentPage]);
   const [isPresenterMode, setIsPresenterMode] = useState(false);
 
   
   
 
   
-  const pages: Array<'cover' | 'resume' | 'directory' | 'chapter' | 'insight1' | 'insight2' | 'persona' | 'survey' | 'signal' | 'taskDecision' | 'operatorStudy' | 'userJourney' | 'directory2' | 'chapter2' | 'directory3' | 'chapter3' | 'ending'> = ['cover', 'resume', 'directory', 'chapter', 'insight1', 'insight2', 'persona', 'survey', 'signal', 'taskDecision', 'operatorStudy', 'userJourney', 'directory2', 'chapter2', 'directory3', 'chapter3', 'ending'];
+
   const currentIndex = pages.indexOf(currentPage);
 
   const goNext = useCallback(() => {
@@ -42,12 +56,13 @@ export default function App() {
   const goPrev = useCallback(() => {
     setCurrentPage(prev => {
       const idx = pages.indexOf(prev);
-      return idx > 2 ? pages[idx - 1] : prev; // Temporarily hide 01-02
+      return idx > 0 ? pages[idx - 1] : prev;
     });
   }, [pages]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, button, [contenteditable], .design-tools')) return;
       if (e.key === 'ArrowRight') goNext();
       if (e.key === 'ArrowLeft') goPrev();
       if (e.key === 'p' || e.key === 'P') setIsPresenterMode(prev => !prev);
@@ -57,18 +72,19 @@ export default function App() {
   }, [goNext, goPrev]);
 
   return (
-    <div className="min-h-screen bg-[#E5E9F0] flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 lg:p-12 font-sans selection:bg-[#1853FF] selection:text-white relative overflow-y-auto overflow-x-hidden">
+    <div className="deck-workspace min-h-screen bg-[#E5E9F0] flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 lg:p-12 font-sans selection:bg-[var(--color-primary)] selection:text-white relative overflow-y-auto overflow-x-hidden">
       
+      <DesignPanel pageId={currentPage} pageNumber={currentIndex + 1} />
       {/* Floating Timer */}
       <AnimatePresence>
         {isPresenterMode && <PresenterTimer />}
       </AnimatePresence>
       
       {/* Main Layout Container */}
-      <div className={`flex flex-col w-full transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isPresenterMode ? 'gap-3 lg:gap-4' : 'gap-6 lg:gap-8'} max-w-[1280px] xl:max-w-[1440px] items-center`}>
+      <div className={`deck-stage flex flex-col w-full transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isPresenterMode ? 'gap-3 lg:gap-4' : 'gap-6 lg:gap-8'} max-w-[1280px] xl:max-w-[1440px] items-center`}>
         
         {/* Main Canvas (PPT 16:9 Aspect Ratio) */}
-        <div className={`relative flex flex-col w-full shrink-0 shadow-[20px_30px_80px_-20px_rgba(0,0,0,0.12)] rounded-[2rem] lg:rounded-[3rem] border-[1.5px] border-white overflow-hidden bg-[#F4F6FB] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]`} style={{ aspectRatio: '16/9' }}>
+        <div className={`deck-canvas relative flex flex-col w-full shrink-0 shadow-[20px_30px_80px_-20px_rgba(0,0,0,0.12)] rounded-[2rem] lg:rounded-[3rem] border-[1.5px] border-white overflow-hidden bg-[var(--slide-bg)] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]`} style={{ aspectRatio: '16/9' }}>
           <AmbientBackground />
           <AnimatePresence mode="wait">
             {currentPage === 'cover' && (
@@ -107,6 +123,15 @@ export default function App() {
             {currentPage === 'userJourney' && (
               <UserJourneyPage onBack={() => setCurrentPage('operatorStudy')} />
             )}
+            {currentPage === 'rootCause' && (
+              <RootCausePage onBack={() => setCurrentPage('userJourney')} />
+            )}
+            {currentPage === 'bizModel' && (
+              <BusinessModelPage onBack={() => setCurrentPage('rootCause')} />
+            )}
+            {currentPage === 'solutionMap' && (
+              <SolutionMapPage onBack={() => setCurrentPage('bizModel')} />
+            )}
             {currentPage === 'directory2' && (
               <DirectoryPage activeId="02" onNavigate={(id) => setCurrentPage(id === '01' ? 'chapter' : id === '02' ? 'chapter2' : 'chapter3')} />
             )}
@@ -140,8 +165,9 @@ export default function App() {
       {/* Floating Page Switcher */}
       <div className="mt-6 lg:mt-8 bg-white/60 backdrop-blur-xl px-2 py-1.5 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white flex items-center gap-3 z-50 shrink-0 transition-all duration-500 hover:bg-white/80 hover:shadow-lg">
         <button
+          aria-label="上一页"
           onClick={goPrev}
-          disabled={currentIndex === 2}
+          disabled={currentIndex === 0}
           className="p-1.5 rounded-full text-gray-500 hover:text-gray-900 hover:bg-white/50 transition-all disabled:opacity-30 disabled:hover:bg-transparent"
         >
           <ChevronLeft className="w-4 h-4" strokeWidth={3} />
@@ -152,10 +178,11 @@ export default function App() {
             {String(currentIndex + 1).padStart(2, '0')}
           </span>
           <span className="text-gray-400 font-medium">/</span>
-          <span className="text-gray-400 font-medium">15</span>
+          <span className="text-gray-400 font-medium">{String(pages.length).padStart(2, '0')}</span>
         </div>
         
         <button
+          aria-label="下一页"
           onClick={goNext}
           disabled={currentIndex === pages.length - 1}
           className="p-1.5 rounded-full text-gray-500 hover:text-gray-900 hover:bg-white/50 transition-all disabled:opacity-30 disabled:hover:bg-transparent"
@@ -167,7 +194,7 @@ export default function App() {
         
         <button 
           onClick={() => setIsPresenterMode(!isPresenterMode)}
-          className={`p-1.5 rounded-full transition-all ${isPresenterMode ? 'bg-[#1853FF] text-white shadow-md' : 'text-slate-400 hover:text-[#1853FF] hover:bg-[#1853FF]/10'}`}
+          className={`p-1.5 rounded-full transition-all ${isPresenterMode ? 'bg-[var(--color-primary)] text-white shadow-md' : 'text-slate-400 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10'}`}
           title="排练模式 (快捷键 P)"
         >
           <MonitorPlay className="w-4 h-4" strokeWidth={isPresenterMode ? 2.5 : 2} />

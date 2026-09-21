@@ -15,7 +15,7 @@ export default function PersonaPage({ onBack }: { onBack: () => void }) {
       avatar: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=256&h=256&fit=crop&q=80',
       gradient: 'from-[#7CE1FE]/60 via-[#7CE1FE]/10 to-white',
       shadow: 'shadow-[0_8px_30px_rgba(24,83,255,0.08)]',
-      accent: 'text-[#1853FF]',
+      accent: 'text-[var(--color-primary)]',
       attributes: [
         { label: '角色', value: '大区总监', icon: Briefcase },
         { label: '团队', value: '40-80人', icon: Users },
@@ -126,12 +126,12 @@ export default function PersonaPage({ onBack }: { onBack: () => void }) {
             onClick={onBack}
           >
             <div className="flex -space-x-1.5 shadow-sm group-hover:scale-110 transition-transform">
-              <div className="w-5 h-5 rounded-full bg-[#1853FF] relative z-10 ring-2 ring-[#F4F6FB]" />
-              <div className="w-5 h-5 rounded-full bg-[#00D084] ring-2 ring-[#F4F6FB]" />
+              <div className="w-5 h-5 rounded-full bg-[var(--color-primary)] relative z-10 ring-2 ring-[var(--slide-bg)]" />
+              <div className="w-5 h-5 rounded-full bg-[#00D084] ring-2 ring-[var(--slide-bg)]" />
             </div>
             <h1 className="text-[14px] font-black tracking-[0.2em] text-gray-800 uppercase mt-0.5 flex items-center">
-              <ChevronLeft className="w-4 h-4 mr-1 opacity-0 group-hover:opacity-100 transition-all -ml-5 group-hover:ml-0 text-[#1853FF]" strokeWidth={3} />
-              <span className="group-hover:text-[#1853FF] transition-colors">PHASE 01 / INITIAL PERSONA</span>
+              <ChevronLeft className="w-4 h-4 mr-1 opacity-0 group-hover:opacity-100 transition-all -ml-5 group-hover:ml-0 text-[var(--color-primary)]" strokeWidth={3} />
+              <span className="group-hover:text-[var(--color-primary)] transition-colors">PHASE 01 / INITIAL PERSONA</span>
             </h1>
           </div>
           <div className="text-lg lg:text-xl font-bold text-gray-400 tracking-wider">
@@ -152,17 +152,18 @@ export default function PersonaPage({ onBack }: { onBack: () => void }) {
           </div>
 
           {/* Three Columns */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 lg:gap-3.5 flex-1 min-h-0 items-stretch overflow-hidden">
+          <div data-design-layout="角色卡片布局" className="grid grid-cols-1 lg:grid-cols-3 gap-y-4 gap-x-10 flex-1 min-h-0 items-stretch w-[88%] self-center my-10">
             {personas.map((persona, idx) => (
               <motion.div 
                 key={persona.id}
+                data-design-card={`${persona.name} · 整张角色卡片`}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 * idx, ease: [0.16, 1, 0.3, 1] }}
                 className="flex flex-col h-full bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-slate-200/70 overflow-hidden hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)] transition-all duration-300 min-h-0"
               >
                 {/* Block 1: Profile */}
-                <div className={`bg-gradient-to-b ${persona.gradient} p-3.5 lg:p-4 flex flex-col relative shrink-0`}>
+                <div className={`bg-gradient-to-b ${persona.gradient} p-4 flex flex-col justify-center relative flex-[1.25]`}>
                   {/* Top row: Avatar + Name + Location + Badge */}
                   <div className="flex items-center gap-3 mb-2.5 relative">
                     <div className="w-10 h-10 lg:w-11 lg:h-11 rounded-full overflow-hidden shadow-sm shrink-0 ring-2 ring-white">
@@ -170,12 +171,12 @@ export default function PersonaPage({ onBack }: { onBack: () => void }) {
                     </div>
                     <div className="flex flex-col">
                       <h3 className="text-sm lg:text-base font-black text-slate-900 leading-tight">{persona.name}</h3>
-                      <div className="text-[10px] lg:text-[11px] text-slate-600 font-medium">{persona.location}</div>
+                      <div className="text-[11px] lg:text-[11px] text-slate-600 font-medium">{persona.location}</div>
                     </div>
                     
                     {/* Role Badge (Tag) */}
                     <div className="absolute top-0 right-0">
-                      <span className="inline-block bg-white/80 backdrop-blur-xs text-slate-800 text-[10px] lg:text-[11px] font-bold px-2 py-0.5 rounded-md border border-white/80 shadow-xs">
+                      <span className="inline-block bg-white/80 backdrop-blur-xs text-slate-800 text-[11px] lg:text-[11px] font-bold px-2 py-0.5 rounded-md border border-white/80 shadow-xs">
                         {persona.badge}
                       </span>
                     </div>
@@ -187,38 +188,38 @@ export default function PersonaPage({ onBack }: { onBack: () => void }) {
                       <div key={i} className="flex items-center gap-1.5">
                         <attr.icon className="w-3 h-3 text-slate-700 shrink-0" strokeWidth={2.5} />
                         <div className="flex items-center gap-1 whitespace-nowrap">
-                          <span className="text-[9.5px] lg:text-[10px] text-slate-900 font-bold">{attr.label}:</span>
-                          <span className="text-[9.5px] lg:text-[10px] text-slate-600 font-medium">{attr.value}</span>
+                          <span className="text-[11px] lg:text-[11px] text-slate-900 font-bold">{attr.label}:</span>
+                          <span className="text-[11px] lg:text-[11px] text-slate-600 font-medium">{attr.value}</span>
                         </div>
                       </div>
                     ))}
                   </div>
 
                   {/* Description Paragraph */}
-                  <p className="text-[9.5px] lg:text-[10.5px] font-medium text-slate-600 leading-snug text-left w-full">
+                  <p className="text-[11px] lg:text-[11px] font-medium text-slate-600 leading-snug text-left w-full">
                     {persona.description}
                   </p>
                 </div>
 
                 {/* Block 2: Goals */}
-                <div className="p-3 lg:p-3.5 flex flex-col shrink-0 bg-white border-t border-slate-100">
+                <div className="p-4 flex flex-col justify-center flex-1 bg-white border-t border-slate-100">
                   <div className="flex items-center gap-1.5 mb-1.5">
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-slate-100 text-[9px]">
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-slate-100 text-[11px]">
                       ⚽️
                     </div>
                     <h4 className="text-xs lg:text-[13px] font-bold text-slate-800">
                       {persona.goals.title}
                     </h4>
                   </div>
-                  <p className="text-[9.5px] lg:text-[10.5px] leading-relaxed font-medium text-slate-500">
+                  <p className="text-[11px] lg:text-[11px] leading-relaxed font-medium text-slate-500">
                     {persona.goals.text}
                   </p>
                 </div>
 
                 {/* Block 3: Needs */}
-                <div className="p-3 lg:p-3.5 flex-1 flex flex-col bg-white border-t border-slate-100 min-h-0 justify-center">
+                <div className="p-4 flex flex-col justify-center flex-[1.1] bg-white border-t border-slate-100">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-slate-100 text-[9px]">
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-slate-100 text-[11px]">
                       😃
                     </div>
                     <h4 className="text-xs lg:text-[13px] font-bold text-slate-800">
@@ -229,8 +230,8 @@ export default function PersonaPage({ onBack }: { onBack: () => void }) {
                   <ul className="flex flex-col gap-1.5">
                     {persona.needs.items.map((item, i) => (
                       <li key={i} className="flex items-start gap-1.5">
-                        <ArrowRight className="w-3 h-3 mt-0.5 shrink-0 text-[#1853FF]" strokeWidth={2.5} />
-                        <span className="text-[9.5px] lg:text-[10.5px] font-medium leading-snug text-slate-600">
+                        <ArrowRight className="w-3 h-3 mt-0.5 shrink-0 text-[var(--color-primary)]" strokeWidth={2.5} />
+                        <span className="text-[11px] lg:text-[11px] font-medium leading-snug text-slate-600">
                           {item}
                         </span>
                       </li>
@@ -246,4 +247,3 @@ export default function PersonaPage({ onBack }: { onBack: () => void }) {
     </motion.div>
   );
 }
-

@@ -10,7 +10,7 @@ export default function EndingPage() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute inset-0 w-full h-full bg-[#0A0D14] text-white p-5 sm:p-7 md:p-8 lg:p-10 xl:p-12 flex flex-col justify-between overflow-hidden rounded-[2rem] lg:rounded-[3rem] font-sans selection:bg-[#5B89FF] selection:text-black select-none"
+      className="absolute inset-0 w-full h-full bg-[var(--slide-dark)] text-white p-5 sm:p-7 md:p-8 lg:p-10 xl:p-12 flex flex-col justify-between overflow-hidden rounded-[2rem] lg:rounded-[3rem] font-sans selection:bg-[#5B89FF] selection:text-black select-none"
     >
       {/* Background Subtle Grain - Same as Cover */}
       <div 
@@ -27,7 +27,7 @@ export default function EndingPage() {
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
           className="absolute w-[60%] h-[60%] rounded-full bg-gradient-to-tr from-[#5B89FF]/10 to-[#8B5CF6]/10 blur-[120px]"
         />
-        <div className="absolute inset-0 bg-[#0A0D14]/40 backdrop-blur-[30px] z-10"></div>
+        <div className="absolute inset-0 bg-[var(--slide-dark)]/40 backdrop-blur-[30px] z-10"></div>
       </div>
 
       {/* Top Header - Same as Cover */}
@@ -73,7 +73,7 @@ export default function EndingPage() {
                <div className="w-10 h-10 rounded-full bg-[#5B89FF]/10 flex items-center justify-center text-[#5B89FF] group-hover:scale-110 transition-transform mb-2">
                   <Mail className="w-4 h-4" />
                </div>
-               <div className="text-[9px] text-white/40 font-bold uppercase tracking-widest mb-1">Email</div>
+               <div className="text-[11px] text-white/40 font-bold uppercase tracking-widest mb-1">Email</div>
                <div className="text-white/90 text-xs sm:text-sm font-medium tracking-wide">lijinmei915@gmail.com</div>
             </div>
 
@@ -82,7 +82,7 @@ export default function EndingPage() {
                <div className="w-10 h-10 rounded-full bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6] group-hover:scale-110 transition-transform mb-2">
                   <MessageCircle className="w-4 h-4" />
                </div>
-               <div className="text-[9px] text-white/40 font-bold uppercase tracking-widest mb-1">WeChat / Phone</div>
+               <div className="text-[11px] text-white/40 font-bold uppercase tracking-widest mb-1">WeChat / Phone</div>
                <div className="text-white/90 text-xs sm:text-sm font-medium tracking-wide">提供后随时联络</div>
             </div>
          </motion.div>
