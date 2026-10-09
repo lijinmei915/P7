@@ -2,11 +2,50 @@ import { DesignElement, isDesignElement, iconName } from '../design/elements';
 import { pageName } from '../design/pageNames';
 import SpacingControl from './SpacingControl';
 import DimensionControl from './DimensionControl';
+import AlignmentControl from './AlignmentControl';
 import { useRecordedState } from '../design/history';
 import React, { useEffect, useRef, useState } from 'react';
 import { libraryDefaults, Rule, slots } from '../design/library';
 import { useTextChanges } from './TextChanges';
 import SelectionOutline from './SelectionOutline';
+import { ArrowUp, ArrowDown, RotateCcw } from 'lucide-react';
+import { ChangeRecord, ChangeSubItem } from '../design/changes';
+
+const slotLabelMap: Record<string, string> = {
+  'grid-template-columns': '网格列数',
+  'flex-direction': '方向',
+  'align-items': '对齐',
+  'align-content': '内容垂直对齐',
+  'justify-content': '分布',
+  'justify-items': '单元格对齐',
+  'typography': '字体',
+  'color': '字色',
+  'width': '宽度',
+  'height': '高度',
+  'background-color': '背景',
+  'border-color': '边框',
+  'border-radius': '圆角',
+  'padding-top': '上内距',
+  'padding-bottom': '下内距',
+  'padding-left': '左内距',
+  'padding-right': '右内距',
+  'margin-top': '上外距',
+  'margin-bottom': '下外距',
+  'margin-left': '左外距',
+  'margin-right': '右外距',
+  'row-gap': '行距',
+  'column-gap': '列距',
+  'text-align': '文字对齐',
+  'align-self': '自身对齐',
+  'justify-self': '自身分布',
+  'position': '定位模式',
+  'top': '顶部距离',
+  'left': '左侧距离',
+  'right': '右侧距离',
+  'bottom': '底部距离',
+  'z-index': '层叠层级',
+};
+
 type Data = Record<string, Record<string, Record<string, string>>>;
 function read<T>(key: string, fallback: T): T { try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; } catch { return fallback; } }
 function selectorFor(el: DesignElement) {
@@ -19,7 +58,7 @@ function selectorFor(el: DesignElement) {
   }
   return node ? '.deck-canvas' + (parts.length ? ' > ' + parts.join(' > ') : '') : '';
 }
-export default function ElementEditor({ element, pageId, onSelect, onHandoff, mode, onSummary, scope }: { mode: 'edit' | 'library'; scope: 'page' | 'global'; onSummary: (summary: string[]) => void; element: DesignElement | null; pageId: string; onSelect: (el: DesignElement | null) => void; onHandoff: (payload: string) => void }) {
+export default function ElementEditor({ element, pageId, onSelect, onHandoff, mode, onSummary, onRecordsChange, scope }: { mode: 'edit' | 'library'; scope: 'page' | 'global'; onSummary: (summary: string[]) => void; onRecordsChange?: (records: ChangeRecord[]) => void; element: DesignElement | null; pageId: string; onSelect: (el: DesignElement | null) => void; onHandoff: (payload: string) => void }) {
   const [refs, setRefs] = useRecordedState<Data>(() => read('p7-element-refs-v2', {}));
   const [legacy, setLegacy] = useRecordedState<Data>(() => read('p7-element-styles-v1', {}));
   const [library, setLibrary] = useRecordedState<Rule[]>(() => {
@@ -52,7 +91,13 @@ export default function ElementEditor({ element, pageId, onSelect, onHandoff, mo
   const [height, setHeight] = useState('1.5');
   const [sizeError, setSizeError] = useState('');
   const selector = element ? selectorFor(element) : '';
+  const breadcrumbRef = useRef<HTMLElement>(null);
   useEffect(() => { setSizeError(''); }, [element]);
+  useEffect(() => {
+    if (breadcrumbRef.current) {
+      breadcrumbRef.current.scrollLeft = breadcrumbRef.current.scrollWidth;
+    }
+  }, [element]);
   const ancestors: DesignElement[] = [];
   let ancestor = element;
   while (ancestor && ancestor.closest('.deck-canvas')) { ancestors.unshift(ancestor); ancestor = ancestor.parentElement; }
@@ -64,7 +109,116 @@ export default function ElementEditor({ element, pageId, onSelect, onHandoff, mo
   const rememberedChild = element ? childHistory.current.get(element) : null;
   const childElement = rememberedChild?.parentElement === element ? rememberedChild :
     element && !(element instanceof SVGSVGElement) ? Array.from(element.children).find((child): child is DesignElement => isDesignElement(child)) : null;
-  const { edits: textEdits, editor: textEditor } = useTextChanges(element, pageId, selector);
+  const { edits: textEdits, editor: textEditor, revertTextEdit } = useTextChanges(element, pageId, selector);
+
+  const removeElementSlot = (page: string, target: string, slot: string) => {
+    try {
+      const node = document.querySelector<HTMLElement>(target);
+      if (node) {
+        if (slot === 'width') {
+          node.style.removeProperty('width');
+          node.style.removeProperty('min-width');
+          node.style.removeProperty('flex');
+        } else if (slot === 'height') {
+          node.style.removeProperty('height');
+          node.style.removeProperty('min-height');
+          node.style.removeProperty('flex');
+        } else if (slot === 'align-items') {
+          node.style.removeProperty('align-items');
+          node.style.removeProperty('align-content');
+        } else if (slot === 'justify-content') {
+          node.style.removeProperty('justify-content');
+          node.style.removeProperty('justify-items');
+        } else if (slot === 'typography') {
+          node.style.removeProperty('font-size');
+          node.style.removeProperty('font-weight');
+          node.style.removeProperty('line-height');
+        } else if (slot === 'position') {
+          node.style.removeProperty('position');
+          node.style.removeProperty('top');
+          node.style.removeProperty('left');
+          node.style.removeProperty('right');
+          node.style.removeProperty('bottom');
+          node.style.removeProperty('z-index');
+        } else {
+          node.style.removeProperty(slot);
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    setRefs(p => {
+      const pageRefs = { ...p[page] };
+      if (!pageRefs[target]) return p;
+      const elementRefs = { ...pageRefs[target] };
+      delete elementRefs[slot];
+      if (slot === 'align-items') delete elementRefs['align-content'];
+      if (slot === 'justify-content') delete elementRefs['justify-items'];
+      if (slot === 'position') {
+        delete elementRefs['top'];
+        delete elementRefs['left'];
+        delete elementRefs['right'];
+        delete elementRefs['bottom'];
+        delete elementRefs['z-index'];
+      }
+      if (Object.keys(elementRefs).length === 0) {
+        delete pageRefs[target];
+      } else {
+        pageRefs[target] = elementRefs;
+      }
+      return { ...p, [page]: pageRefs };
+    });
+
+    setLegacy(p => {
+      const pageStyles = { ...p[page] };
+      if (!pageStyles[target]) return p;
+      const elementStyles = { ...pageStyles[target] };
+      delete elementStyles[slot];
+      if (slot === 'align-items') delete elementStyles['align-content'];
+      if (slot === 'justify-content') delete elementStyles['justify-items'];
+      if (slot === 'position') {
+        delete elementStyles['top'];
+        delete elementStyles['left'];
+        delete elementStyles['right'];
+        delete elementStyles['bottom'];
+        delete elementStyles['z-index'];
+      }
+      if (slot === 'typography') {
+        delete elementStyles['font-size'];
+        delete elementStyles['font-weight'];
+        delete elementStyles['line-height'];
+      }
+      if (Object.keys(elementStyles).length === 0) {
+        delete pageStyles[target];
+      } else {
+        pageStyles[target] = elementStyles;
+      }
+      return { ...p, [page]: pageStyles };
+    });
+  };
+
+  const removeElementEntirely = (page: string, target: string) => {
+    try {
+      const node = document.querySelector<HTMLElement>(target);
+      if (node) {
+        node.removeAttribute('style');
+      }
+    } catch {
+      // ignore
+    }
+    setRefs(p => {
+      const pageRefs = { ...p[page] };
+      delete pageRefs[target];
+      return { ...p, [page]: pageRefs };
+    });
+    setLegacy(p => {
+      const pageStyles = { ...p[page] };
+      delete pageStyles[target];
+      return { ...p, [page]: pageStyles };
+    });
+  };
+
   const ruleUsage = (id: string) => Object.entries(refs).flatMap(([page, targets]) => Object.entries(targets).filter(([, properties]) => Object.values(properties).includes(id)).map(([target]) => ({ page, target })));
   useEffect(() => {
     if (mode !== 'library' || !usageRule) return;
@@ -74,16 +228,119 @@ export default function ElementEditor({ element, pageId, onSelect, onHandoff, mo
   }, [usageRule, refs, pageId, mode]);
   useEffect(() => {
     const summary: string[] = [];
-    Object.entries(textEdits).forEach(([page, edits]) => Object.values(edits).forEach(edit => { if (edit.before !== edit.after) summary.push(`${pageName(page)} · 文案：${edit.before} → ${edit.after}`); }));
-    Object.entries(refs).forEach(([page, targets]) => Object.entries(targets).forEach(([target, properties]) => {
-      const used = Object.entries(properties).filter(([, id]) => id).map(([slot, id]) => `${slots.find(item => item[0] === slot)?.[1] || slot}：${library.find(rule => rule.id === id)?.name || id}`);
-      if (used.length) summary.push(`${pageName(page)} · 元素 ${Object.keys(targets).indexOf(target) + 1} · ${used.join('，')}`);
-    }));
-    library.forEach(rule => { const original = libraryDefaults.find(item => item.id === rule.id); if (!original || JSON.stringify(original.values) !== JSON.stringify(rule.values)) summary.push(`${original ? '修改' : '新增'}规范：${rule.name} · ${Object.values(rule.values).join(' / ')}`); });
-    Object.entries(legacy).forEach(([page, targets]) => Object.values(targets).forEach(properties => { if (Object.keys(properties).length) summary.push(`${pageName(page)} · 保留旧版调整：${Object.entries(properties).map(([key, value]) => `${key} ${value}`).join('，')}`); }));
+    const records: ChangeRecord[] = [];
+
+    // 1. Text edits
+    Object.entries(textEdits).forEach(([page, edits]) => {
+      Object.entries(edits).forEach(([target, edit]) => {
+        if (edit.before !== edit.after) {
+          const raw = `${pageName(page)} · 文案：${edit.before} → ${edit.after}`;
+          summary.push(raw);
+          records.push({
+            id: `text-${page}-${target}`,
+            category: 'text',
+            title: `${pageName(page)} · 文案修改`,
+            description: `「${edit.before}」→「${edit.after}」`,
+            rawText: raw,
+            onDelete: () => revertTextEdit(page, target),
+          });
+        }
+      });
+    });
+
+    // 2. Element modifications (refs & legacy)
+    const allPages = Array.from(new Set([...Object.keys(refs), ...Object.keys(legacy)]));
+    allPages.forEach(page => {
+      const pageRefs = refs[page] || {};
+      const pageLegacy = legacy[page] || {};
+      const allTargets = Array.from(new Set([...Object.keys(pageRefs), ...Object.keys(pageLegacy)]));
+
+      allTargets.forEach((target, targetIndex) => {
+        const targetRefs = pageRefs[target] || {};
+        const targetLegacy = pageLegacy[target] || {};
+        const subItems: ChangeSubItem[] = [];
+
+        const allSlots = Array.from(new Set([...Object.keys(targetRefs), ...Object.keys(targetLegacy)]));
+
+        allSlots.forEach(slot => {
+          if (slot === 'align-content' && (targetRefs['align-items'] || targetLegacy['align-items'])) return;
+          if (slot === 'justify-items' && (targetRefs['justify-content'] || targetLegacy['justify-content'])) return;
+
+          const ruleId = targetRefs[slot];
+          let displayVal = '';
+          if (ruleId) {
+            displayVal = library.find(rule => rule.id === ruleId)?.name || ruleId;
+          } else if (targetLegacy[slot]) {
+            displayVal = targetLegacy[slot];
+          }
+
+          if (!displayVal) return;
+          const slotLabel = slotLabelMap[slot] || slots.find(item => item[0] === slot)?.[1] || slot;
+
+          subItems.push({
+            id: slot,
+            label: slotLabel,
+            value: displayVal,
+            onDelete: () => removeElementSlot(page, target, slot),
+          });
+        });
+
+        if (subItems.length > 0) {
+          const raw = `${pageName(page)} · 元素 ${targetIndex + 1} · ${subItems.map(s => `${s.label}：${s.value}`).join('，')}`;
+          summary.push(raw);
+          records.push({
+            id: `element-${page}-${target}`,
+            category: 'element',
+            title: `${pageName(page)} · 元素 ${targetIndex + 1}`,
+            subItems,
+            rawText: raw,
+            onDelete: () => removeElementEntirely(page, target),
+          });
+        }
+      });
+    });
+
+    // 3. Library rules
+    library.forEach(rule => {
+      const original = libraryDefaults.find(item => item.id === rule.id);
+      const isCustom = !original;
+      const isModified = original && JSON.stringify(original.values) !== JSON.stringify(rule.values);
+
+      if (isCustom || isModified) {
+        const raw = `${original ? '修改' : '新增'}规范：${rule.name} · ${Object.values(rule.values).join(' / ')}`;
+        summary.push(raw);
+        records.push({
+          id: `rule-${rule.id}`,
+          category: 'rule',
+          title: `${original ? '修改' : '新增'}规范 · ${rule.name}`,
+          description: Object.values(rule.values).join(' / '),
+          rawText: raw,
+          onDelete: () => {
+            if (isCustom) {
+              setLibrary(p => p.filter(r => r.id !== rule.id));
+              setRefs(p => {
+                const updated = { ...p };
+                for (const pg of Object.keys(updated)) {
+                  for (const sel of Object.keys(updated[pg] || {})) {
+                    for (const [slot, id] of Object.entries(updated[pg][sel])) {
+                      if (id === rule.id) delete updated[pg][sel][slot];
+                    }
+                  }
+                }
+                return updated;
+              });
+            } else if (original) {
+              setLibrary(p => p.map(r => r.id === rule.id ? { ...original } : r));
+            }
+          },
+        });
+      }
+    });
+
     onSummary(summary);
+    if (onRecordsChange) onRecordsChange(records);
     onHandoff('请将以下 P7 预览中的调整落实到项目源码，保持已有设计规范。元素定位按页面 ID 和页面内选择器记录；若结构已变化，请先核对内容。\n' + JSON.stringify({ 当前页面: pageId, 文案改动: textEdits, 元素规范引用: refs, 旧版属性覆盖: legacy, 规范库: library }, null, 2));
-  }, [pageId, textEdits, refs, legacy, library, onHandoff, onSummary]);
+  }, [pageId, textEdits, refs, legacy, library, onHandoff, onSummary, onRecordsChange]);
   const pending = legacy[pageId]?.[selector] || {};
   const isIcon = element instanceof SVGSVGElement;
   const isText = !isIcon && !!element?.textContent?.trim() && (element.children.length === 0 || element.matches('h1,h2,h3,h4,p,span,small,strong,label'));
@@ -96,10 +353,9 @@ export default function ElementEditor({ element, pageId, onSelect, onHandoff, mo
     if (isText) return ['typography', 'color'].includes(slot);
     if (slot === 'grid-template-columns') return isLayout && isGrid;
     if (slot === 'flex-direction') return isLayout && isFlex;
-    if (slot === 'align-items') return isLayout && layoutOptions.align;
-    if (slot === 'justify-content') return isLayout && layoutOptions.distribute;
-    if (slot === 'row-gap') return (isFlex || isGrid) && layoutOptions.rows;
-    if (slot === 'column-gap') return (isFlex || isGrid) && layoutOptions.columns;
+    if (slot === 'align-items' || slot === 'justify-content') return false; // Handled directly by AlignmentControl!
+    if (slot === 'row-gap') return isFlex || isGrid;
+    if (slot === 'column-gap') return isFlex || isGrid;
     if (slot === 'border-color') return !isLayout && layoutOptions.border;
     if (isLayout) return layoutOrder.includes(slot);
     return !['typography', 'color'].includes(slot);
@@ -118,16 +374,58 @@ export default function ElementEditor({ element, pageId, onSelect, onHandoff, mo
       if (explicitColor) css.color = explicitColor.values.value;
       const node = document.querySelector<DesignElement>(target);
       const parent = node?.parentElement ? getComputedStyle(node.parentElement) : null;
-      const mainAxis = parent?.flexDirection.startsWith('column') ? 'height' : 'width';
+      const isFlex = !!parent?.display.includes('flex');
+      const isGrid = !!parent?.display.includes('grid');
+      const isColumn = !!parent?.flexDirection.startsWith('column');
+
       for (const axis of ['width', 'height']) {
         const id = refs[pageId]?.[target]?.[axis];
+        if (!id) continue;
         const rule = library.find(item => item.id === id);
-        if (rule?.values.mode === 'remaining') {
-          css[axis] = 'auto'; css[`min-${axis}`] = '0';
-          if (parent?.display.includes('flex') && mainAxis === axis) css.flex = '1 1 0%';
-          else { css['align-self'] = 'stretch'; css['justify-self'] = 'stretch'; }
-        } else if (css[axis] && parent?.display.includes('flex') && mainAxis === axis) {
-          css['flex-shrink'] = '0'; css['flex-grow'] = '0'; css['flex-basis'] = 'auto';
+        if (!rule) continue;
+
+        const isFlexMainAxis = isFlex && ((isColumn && axis === 'height') || (!isColumn && axis === 'width'));
+        const isFlexCrossAxis = isFlex && !isFlexMainAxis;
+
+        if (rule.values.mode === 'remaining') {
+          css[axis] = 'auto';
+          css[`min-${axis}`] = '0';
+          if (isFlexMainAxis) {
+            css.flex = '1 1 0%';
+          } else {
+            if (axis === 'height') css['align-self'] = 'stretch';
+            if (axis === 'width') css['justify-self'] = 'stretch';
+          }
+        } else if (rule.id === 'size-full') {
+          css[axis] = '100%';
+          if (isFlexMainAxis) {
+            css.flex = '1 1 100%';
+          } else {
+            if (axis === 'height') css['align-self'] = 'stretch';
+            if (axis === 'width') css['justify-self'] = 'stretch';
+          }
+        } else {
+          // Explicit content, auto, or fixed px sizing
+          css[axis] = rule.values.value;
+          if (rule.values.value.endsWith('px')) {
+            css[`min-${axis}`] = rule.values.value;
+            css[`max-${axis}`] = rule.values.value;
+          }
+
+          if (isGrid) {
+            if (axis === 'height') {
+              css['align-self'] = 'start';
+            }
+            if (axis === 'width') {
+              css['justify-self'] = 'start';
+            }
+          } else if (isFlexCrossAxis) {
+            css['align-self'] = 'flex-start';
+          } else if (isFlexMainAxis) {
+            css['flex-shrink'] = '0';
+            css['flex-grow'] = '0';
+            css['flex-basis'] = rule.values.value;
+          }
         }
       }
       if (css['font-size']) css['font-size'] = `max(11px, ${css['font-size']})`;
@@ -184,8 +482,33 @@ export default function ElementEditor({ element, pageId, onSelect, onHandoff, mo
     try { localStorage.setItem('p7-element-refs-v2', JSON.stringify(refs)); localStorage.setItem('p7-element-styles-v1', JSON.stringify(legacy)); localStorage.setItem('p7-library-v1', JSON.stringify(library)); } catch { setMessage('浏览器无法保存设置。'); }
     return () => { sheet.remove(); observer.disconnect(); resizeObserver.disconnect(); window.removeEventListener('resize', measure); };
   }, [refs, legacy, library, pageId, element]);
+  function formatWeight(w: string | undefined): string {
+    if (!w || w === 'normal' || w === '400') return '400 (常规)';
+    if (w === 'bold' || w === '700') return '700 (粗体)';
+    if (w === '500') return '500 (中等)';
+    if (w === '600') return '600 (半粗)';
+    if (w === '800') return '800 (特粗)';
+    if (w === '900') return '900 (极粗)';
+    return w;
+  }
+
+  function formatLineHeight(lh: string | undefined, fontSize?: string): string {
+    if (!lh || lh === 'normal') {
+      if (fontSize) {
+        const fs = parseFloat(fontSize);
+        if (Number.isFinite(fs) && fs > 0) return `~${Math.round(fs * 1.4)}px (默认1.4倍)`;
+      }
+      return '默认 (约1.4倍)';
+    }
+    return lh;
+  }
+
   function format(values: Record<string, string>, typography: boolean) {
-    return typography ? `${values['font-size']} / 字重 ${values['font-weight']} / 行高 ${values['line-height']}${values.color ? ` / 字色 ${values.color}` : ''}` : values.value;
+    if (!typography) return values.value;
+    const size = values['font-size'] || '—';
+    const weight = formatWeight(values['font-weight']);
+    const lh = formatLineHeight(values['line-height'], size);
+    return `${size} / 字重 ${weight} / 行高 ${lh}${values.color ? ` / 字色 ${values.color}` : ''}`;
   }
   function matches(slot: string, rule: Rule) {
     const values = resolved[rule.id]; if (!values) return false;
@@ -209,6 +532,46 @@ export default function ElementEditor({ element, pageId, onSelect, onHandoff, mo
     apply(slot, id);
     setSizeError('');
   }
+  function applyDirectStyle(property: string, value: string, ruleId?: string) {
+    if (!element) return;
+    element.style.setProperty(property, value, 'important');
+    if (ruleId) {
+      setRefs(p => ({
+        ...p,
+        [pageId]: {
+          ...p[pageId],
+          [selector]: {
+            ...p[pageId]?.[selector],
+            [property]: ruleId
+          }
+        }
+      }));
+    }
+    setLegacy(p => ({
+      ...p,
+      [pageId]: {
+        ...p[pageId],
+        [selector]: {
+          ...p[pageId]?.[selector],
+          [property]: value
+        }
+      }
+    }));
+  }
+  function resetStyles(properties: string[]) {
+    if (!element) return;
+    properties.forEach(prop => element.style.removeProperty(prop));
+    setRefs(p => {
+      const next = { ...p[pageId]?.[selector] };
+      properties.forEach(prop => delete next[prop]);
+      return { ...p, [pageId]: { ...p[pageId], [selector]: next } };
+    });
+    setLegacy(p => {
+      const next = { ...p[pageId]?.[selector] };
+      properties.forEach(prop => delete next[prop]);
+      return { ...p, [pageId]: { ...p[pageId], [selector]: next } };
+    });
+  }
   function save() {
     if (!name.trim() || !purpose.trim()) { setMessage('请填写规范名称和用途。'); return; }
     if (library.some(e => e.id !== editing && e.kind === kind && e.name === name.trim())) { setMessage('同类规范名称已存在。'); return; }
@@ -220,43 +583,446 @@ export default function ElementEditor({ element, pageId, onSelect, onHandoff, mo
     setMessage(editing ? '规范已更新，所有引用同步生效。' : '已入库，可在元素属性中选择。'); setEditing(''); setName(''); setPurpose('');
   }
   return <>
-    <SelectionOutline element={element} />
-    {mode === 'edit' && !element && <section className="element-editor"><strong>点击页面元素开始编辑</strong><p className="design-help">选中文字修改文案，选中卡片或布局调整排版。</p><button className="design-trigger" onClick={() => { const target = document.querySelector<DesignElement>('.deck-canvas [data-design-layout], .deck-canvas h2'); if (target) onSelect(target); }}>选择本页主要内容</button></section>}
-    {mode === 'edit' && element && <section className="element-editor"><div className="element-heading"><strong>{isIcon ? '图标属性' : isText ? '文字属性' : isLayout ? '布局属性' : '容器属性'} · 仅选择规范</strong><p className="design-help">{isIcon ? objectName(element) : element.dataset.designCard || element.dataset.designLayout || element.textContent?.trim().slice(0, 36) || '容器'}</p>
-      <nav className="design-breadcrumbs" aria-label="元素层级">{ancestors.map((node, index) => <button key={index} title={objectName(node)} aria-current={node === element ? 'true' : undefined} onClick={() => onSelect(node)}>{objectName(node)}</button>)}</nav>
-      <div className="design-actions design-layer-actions" aria-label="选择层级">
-        <button type="button" aria-label="选择父级" title="选择父级" disabled={!canSelectParent} onClick={() => {
-          if (canSelectParent && parentElement) { childHistory.current.set(parentElement, element); onSelect(parentElement); }
-        }}>↑</button>
-        <button type="button" aria-label="选择子级" title="选择子级（优先返回刚才的元素）" disabled={!childElement} onClick={() => { if (childElement) onSelect(childElement); }}>↓</button>
-        <button type="button" onClick={() => onSelect(null)}>取消选择</button>
+    <SelectionOutline 
+      element={element} 
+      onCommitSize={(slot, px) => applyCustomSize(slot, px)}
+      onAssignMode={(slot, id) => apply(slot, id)}
+      onSelectParent={canSelectParent && parentElement ? () => {
+        childHistory.current.set(parentElement, element);
+        onSelect(parentElement);
+      } : undefined}
+      currentMode={element ? (refs[pageId]?.[selector]?.['width'] || '') : ''}
+    />
+    {mode === 'edit' && !element && (
+      <section className="element-editor-empty">
+        <strong className="element-editor-empty-title">点击页面元素开始编辑</strong>
+        <p className="design-help" style={{ margin: '4px 0 12px' }}>选中文字修改文案，选中卡片或布局调整排版。</p>
+        <button
+          className="element-empty-action"
+          onClick={() => {
+            const target = document.querySelector<DesignElement>('.deck-canvas [data-design-card], .deck-canvas .survey-direction, .deck-canvas [data-design-layout], .deck-canvas h2');
+            if (target) onSelect(target);
+          }}
+        >
+          选择本页主要内容
+        </button>
+      </section>
+    )}
+    {mode === 'edit' && element && <section className="element-editor">
+      <div className="element-heading element-heading-compact">
+        <nav ref={breadcrumbRef} className="design-breadcrumbs" aria-label="元素层级">
+          {ancestors.map((node, index) => {
+            const isCurrent = node === element;
+            const isLast = index === ancestors.length - 1;
+            return (
+              <React.Fragment key={index}>
+                <button
+                  type="button"
+                  className="design-breadcrumb-btn"
+                  title={objectName(node)}
+                  aria-current={isCurrent ? 'true' : undefined}
+                  onClick={() => onSelect(node)}
+                >
+                  {objectName(node)}
+                </button>
+                {!isLast && <span className="design-breadcrumb-sep">›</span>}
+              </React.Fragment>
+            );
+          })}
+        </nav>
+        <div className="design-layer-actions" aria-label="选择层级">
+          <button
+            type="button"
+            className="design-layer-btn"
+            aria-label="选择父级"
+            title="选择父级 (↑)"
+            disabled={!canSelectParent}
+            onClick={() => {
+              if (canSelectParent && parentElement) {
+                childHistory.current.set(parentElement, element);
+                onSelect(parentElement);
+              }
+            }}
+          >
+            <ArrowUp size={12} />
+          </button>
+          <button
+            type="button"
+            className="design-layer-btn"
+            aria-label="选择子级"
+            title="选择子级 (↓)"
+            disabled={!childElement}
+            onClick={() => {
+              if (childElement) onSelect(childElement);
+            }}
+          >
+            <ArrowDown size={12} />
+          </button>
+          <button
+            type="button"
+            className="design-layer-btn design-layer-cancel"
+            title="取消选择"
+            onClick={() => onSelect(null)}
+          >
+            取消
+          </button>
+        </div>
       </div>
-      </div>{textEditor}
-      {!isText && !isIcon && <p className="design-help">宽高选择尺寸规范；内边距控制卡片内部留白，外边距控制周围留白。调整卡片之间的距离，请选中它们的外层布局，修改行／列间距。尺寸按画布原始 px 计，随预览缩放。</p>}
-      {Object.keys(pending).length > 0 && <p className="design-help">未归档旧调整：{Object.entries(pending).map(([k, v]) => `${k}: ${v}`).join('；')}。选择规范逐项替换，或先入库。</p>}
+      {textEditor}
+
+      <AlignmentControl
+        element={element}
+        actual={actual}
+        isText={isText}
+        onApplyStyle={applyDirectStyle}
+        onResetStyle={resetStyles}
+      />
       {relevantSlots.filter(([slot]) => !slot.startsWith('padding-') && !slot.startsWith('margin-')).map(([slot, label, category]) => {
         const candidates = library.filter(e => e.kind === category);
         const assigned = refs[pageId]?.[selector]?.[slot];
         const match = candidates.find(e => e.id === assigned) || candidates.find(e => matches(slot, e));
-        const currentValue = format(slot === 'typography' ? actual : { value: actual[slot] || '—' }, slot === 'typography');
-        if (category === 'size') return <div key={`${selector}-${slot}`}><DimensionControl element={element} slot={slot} label={label} actual={actual[slot] || ''} assigned={match} rules={candidates} apply={id => apply(slot, id)} commit={value => applyCustomSize(slot, value)} /></div>;
-        return <div key={`${selector}-${slot}`} className="design-control"><span>{label}</span>
-          <details className="rule-picker" onKeyDown={event => {
-            if (event.key === 'Escape') { event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); }
-          }}>
-            <summary aria-label={`元素${label}`}>{match ? match.name : `未归档 · ${currentValue}`}</summary>
-            <div className="rule-options" role="group" aria-label={`${label}选项`}>
-              <button type="button" onClick={event => { apply(slot, ''); const details = event.currentTarget.closest('details')!; details.open = false; details.querySelector('summary')?.focus(); }}><strong>沿用页面样式</strong><small>清除此属性的单独设置</small></button>
-              {candidates.map(rule => <button type="button" key={rule.id} aria-pressed={match?.id === rule.id} onClick={event => {
-                apply(slot, rule.id); const details = event.currentTarget.closest('details')!; details.open = false; details.querySelector('summary')?.focus();
-              }}><strong>{rule.name}</strong><small>{rule.name} · {format(resolved[rule.id] || rule.values, slot === 'typography')}</small></button>)}
+        
+        if (category === 'size') {
+          return (
+            <div key={`${selector}-${slot}`}>
+              <DimensionControl
+                element={element}
+                slot={slot}
+                label={label}
+                actual={actual[slot] || ''}
+                assigned={match}
+                rules={candidates}
+                apply={id => apply(slot, id)}
+                commit={value => applyCustomSize(slot, value)}
+              />
             </div>
-          </details></div>;
+          );
+        }
+
+        // 1. Radius Control: Exposed single-click pill bar with specific px values and custom px input
+        if (category === 'radius') {
+          const radiusMap: Record<string, string> = {
+            'radius-sm': '4px',
+            'radius-md': '8px',
+            'radius-lg': '16px',
+            'radius-xl': '24px',
+            'radius-full': '999px',
+          };
+          const currentRadius = legacy[pageId]?.[selector]?.['border-radius'] || actual['border-radius'] || '0px';
+
+          return (
+            <div key={`${selector}-${slot}`} className="design-control">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-semibold text-slate-800">{label}</span>
+                <span className="text-[11px] font-mono text-slate-400">当前: {currentRadius}</span>
+              </div>
+              <div className="radius-chip-bar" role="radiogroup" aria-label="圆角选项">
+                <button
+                  type="button"
+                  className={`radius-chip-btn ${!assigned && !legacy[pageId]?.[selector]?.['border-radius'] ? 'is-active' : ''}`}
+                  onClick={() => {
+                    apply(slot, '');
+                    resetStyles(['border-radius']);
+                  }}
+                  title="沿用页面默认圆角"
+                >
+                  <span>沿用</span>
+                </button>
+                {candidates.map(rule => {
+                  const resolvedVal = resolved[rule.id]?.value;
+                  const displayPx = resolvedVal && resolvedVal.endsWith('px') ? resolvedVal : (radiusMap[rule.id] || rule.values.value);
+                  const isSelected = match?.id === rule.id && !legacy[pageId]?.[selector]?.['border-radius'];
+                  return (
+                    <button
+                      type="button"
+                      key={rule.id}
+                      className={`radius-chip-btn ${isSelected ? 'is-active' : ''}`}
+                      onClick={() => {
+                        resetStyles(['border-radius']);
+                        apply(slot, rule.id);
+                      }}
+                      title={`${rule.name}: ${displayPx}`}
+                    >
+                      <span className="font-semibold">{rule.name}</span>
+                      <span className="radius-chip-val">{displayPx}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="custom-input-inline-wrap">
+                <span className="custom-input-label">自定义数值:</span>
+                <div className="custom-px-input-wrap">
+                  <input
+                    type="number"
+                    min="0"
+                    max="999"
+                    className="custom-px-input"
+                    placeholder="输入圆角"
+                    value={parseInt(currentRadius, 10) || 0}
+                    onChange={e => {
+                      const val = parseInt(e.target.value, 10);
+                      if (Number.isFinite(val) && val >= 0) {
+                        applyDirectStyle('border-radius', `${val}px`);
+                      }
+                    }}
+                  />
+                  <span className="position-coord-unit">px</span>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        // 2. Typography Control: Exposed 2-column preset cards with clear sizes and weights
+        if (category === 'type') {
+          const currentSize = actual['font-size'] || '—';
+          const currentWeight = formatWeight(actual['font-weight']);
+
+          return (
+            <div key={`${selector}-${slot}`} className="design-control">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-semibold text-slate-800">{label}</span>
+                <span className="text-[11px] font-mono text-slate-400">
+                  当前: {currentSize} · {currentWeight}
+                </span>
+              </div>
+              <div className="type-preset-grid" role="radiogroup" aria-label="字体规范选项">
+                <button
+                  type="button"
+                  className={`type-preset-card ${!assigned ? 'is-active' : ''}`}
+                  onClick={() => apply(slot, '')}
+                  title="沿用页面规范"
+                >
+                  <span className="type-preset-name">沿用页面</span>
+                  <span className="type-preset-desc">继承默认</span>
+                </button>
+                {candidates.map(rule => {
+                  const isSelected = match?.id === rule.id;
+                  const size = resolved[rule.id]?.['font-size'] || rule.values['font-size'] || '14px';
+                  const weight = formatWeight(rule.values['font-weight']);
+                  return (
+                    <button
+                      type="button"
+                      key={rule.id}
+                      className={`type-preset-card ${isSelected ? 'is-active' : ''}`}
+                      onClick={() => apply(slot, rule.id)}
+                      title={`${rule.name}: ${size} / ${weight}`}
+                    >
+                      <span className="type-preset-name">{rule.name}</span>
+                      <span className="type-preset-desc">{size} · {weight}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+
+        // 3. Color Control: Exposed color swatch palette bar
+        if (category === 'color') {
+          const currentColor = actual[slot] || '—';
+
+          return (
+            <div key={`${selector}-${slot}`} className="design-control">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-semibold text-slate-800">{label}</span>
+                <span className="text-[11px] font-mono text-slate-400">当前: {currentColor}</span>
+              </div>
+              <div className="color-swatch-row" role="radiogroup" aria-label={`${label}选项`}>
+                <button
+                  type="button"
+                  className={`color-swatch-btn ${!assigned ? 'is-active' : ''}`}
+                  onClick={() => apply(slot, '')}
+                  title="沿用页面"
+                >
+                  <span className="color-swatch-icon color-swatch-inherit">/</span>
+                  <span className="color-swatch-label">沿用</span>
+                </button>
+                {candidates.map(rule => {
+                  const isSelected = match?.id === rule.id;
+                  const colorVal = resolved[rule.id]?.value || rule.values.value;
+                  const isTransparent = colorVal === 'transparent';
+                  const isWhite = colorVal === '#ffffff' || colorVal === 'white' || colorVal === 'rgb(255, 255, 255)';
+
+                  return (
+                    <button
+                      type="button"
+                      key={rule.id}
+                      className={`color-swatch-btn ${isSelected ? 'is-active' : ''}`}
+                      onClick={() => apply(slot, rule.id)}
+                      title={`${rule.name}: ${colorVal}`}
+                    >
+                      <span
+                        className="color-swatch-icon"
+                        style={{
+                          backgroundColor: isTransparent ? 'transparent' : colorVal,
+                          border: isWhite ? '1px solid #cbd5e1' : undefined,
+                        }}
+                      >
+                        {isTransparent && <span className="text-[9px] text-red-500 font-bold">✕</span>}
+                      </span>
+                      <span className="color-swatch-label">{rule.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+
+        // 4. Columns Control: Exposed segmented bar
+        if (category === 'columns') {
+          return (
+            <div key={`${selector}-${slot}`} className="design-control">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-semibold text-slate-800">{label}</span>
+                <span className="text-[11px] font-mono text-slate-400">{actual['grid-template-columns'] || '—'}</span>
+              </div>
+              <div className="segment-options-bar" role="radiogroup" aria-label={`${label}选项`}>
+                <button
+                  type="button"
+                  className={`segment-option-btn ${!assigned ? 'is-active' : ''}`}
+                  onClick={() => apply(slot, '')}
+                >
+                  沿用
+                </button>
+                {candidates.map(rule => (
+                  <button
+                    type="button"
+                    key={rule.id}
+                    className={`segment-option-btn ${match?.id === rule.id ? 'is-active' : ''}`}
+                    onClick={() => apply(slot, rule.id)}
+                  >
+                    {rule.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        }
+
+        // 5. Direction Control: Exposed segmented bar
+        if (category === 'direction') {
+          return (
+            <div key={`${selector}-${slot}`} className="design-control">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-semibold text-slate-800">{label}</span>
+                <span className="text-[11px] font-mono text-slate-400">{actual['flex-direction'] || 'row'}</span>
+              </div>
+              <div className="segment-options-bar" role="radiogroup" aria-label={`${label}选项`}>
+                <button
+                  type="button"
+                  className={`segment-option-btn ${!assigned ? 'is-active' : ''}`}
+                  onClick={() => apply(slot, '')}
+                >
+                  沿用
+                </button>
+                {candidates.map(rule => (
+                  <button
+                    type="button"
+                    key={rule.id}
+                    className={`segment-option-btn ${match?.id === rule.id ? 'is-active' : ''}`}
+                    onClick={() => apply(slot, rule.id)}
+                  >
+                    {rule.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        }
+
+        // 6. Gap Controls (row-gap, column-gap)
+        if (slot === 'row-gap' || slot === 'column-gap') {
+          const quickGaps = candidates.filter(r => [0, 4, 8, 12, 16, 24, 32, 48].includes(parseInt(r.values.value, 10)));
+          return (
+            <div key={`${selector}-${slot}`} className="design-control">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-semibold text-slate-800">{label}</span>
+                <span className="text-[11px] font-mono text-slate-400">当前: {actual[slot] || '0px'}</span>
+              </div>
+              <div className="spacing-chip-bar" role="radiogroup" aria-label={`${label}选项`}>
+                <button
+                  type="button"
+                  className={`spacing-chip-btn ${!assigned ? 'is-active' : ''}`}
+                  onClick={() => apply(slot, '')}
+                >
+                  沿用
+                </button>
+                {quickGaps.map(rule => (
+                  <button
+                    type="button"
+                    key={rule.id}
+                    className={`spacing-chip-btn ${match?.id === rule.id ? 'is-active' : ''}`}
+                    onClick={() => apply(slot, rule.id)}
+                  >
+                    {rule.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        }
+
+        // Generic fallback with exposed chips
+        return (
+          <div key={`${selector}-${slot}`} className="design-control">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs font-semibold text-slate-800">{label}</span>
+              <span className="text-[11px] font-mono text-slate-400">{actual[slot] || '—'}</span>
+            </div>
+            <div className="segment-options-bar" role="radiogroup" aria-label={`${label}选项`}>
+              <button
+                type="button"
+                className={`segment-option-btn ${!assigned ? 'is-active' : ''}`}
+                onClick={() => apply(slot, '')}
+              >
+                沿用
+              </button>
+              {candidates.map(rule => (
+                <button
+                  type="button"
+                  key={rule.id}
+                  className={`segment-option-btn ${match?.id === rule.id ? 'is-active' : ''}`}
+                  onClick={() => apply(slot, rule.id)}
+                >
+                  {rule.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
       })}
-      {!isText && !isIcon && <SpacingControl prefix="padding" actual={actual} rules={library.filter(rule => rule.kind === 'space')} apply={apply} />}
-      {!isText && !isIcon && <details className="more-layout"><summary>更多布局 · 外边距</summary><SpacingControl prefix="margin" actual={actual} rules={library.filter(rule => rule.kind === 'space')} apply={apply} /></details>}
+      {!isText && !isIcon && (
+        <div className="mt-2 space-y-3">
+          <SpacingControl
+            prefix="padding"
+            actual={actual}
+            rules={library.filter(rule => rule.kind === 'space')}
+            apply={apply}
+            onDirectStyle={applyDirectStyle}
+          />
+          <SpacingControl
+            prefix="margin"
+            actual={actual}
+            rules={library.filter(rule => rule.kind === 'space')}
+            apply={apply}
+            onDirectStyle={applyDirectStyle}
+          />
+        </div>
+      )}
       {sizeError && <p role="alert">{sizeError}</p>}
-      <button className="design-trigger" onClick={() => { setRefs(p => ({ ...p, [pageId]: { ...p[pageId], [selector]: {} } })); setLegacy(p => ({ ...p, [pageId]: { ...p[pageId], [selector]: {} } })); }}>恢复此元素原样</button>
+      <button
+        type="button"
+        className="element-reset-btn"
+        onClick={() => {
+          setRefs(p => ({ ...p, [pageId]: { ...p[pageId], [selector]: {} } }));
+          setLegacy(p => ({ ...p, [pageId]: { ...p[pageId], [selector]: {} } }));
+        }}
+      >
+        <RotateCcw size={13} />
+        <span>恢复此元素原样</span>
+      </button>
     </section>}
     <details hidden={mode !== 'library'} className="element-editor"><summary>规范库 · 查看 / 新增 / 修改</summary>
       <p className="design-help">排版底线：页面所有文字不得低于 11px，包含编号、说明、标签和辅助标注。</p>

@@ -41,7 +41,21 @@ export function useTextChanges(element: DesignElement | null, pageId: string, se
     setEdits(p => { const page = { ...p[pageId] }; delete page[selector]; return { ...p, [pageId]: page }; });
     setStatus('已恢复原文。');
   }}>恢复原文</button></div><small role="status">{status}</small></div> : null;
-  return { edits, editor };
+
+  const revertTextEdit = (page: string, target: string) => {
+    const edit = edits[page]?.[target];
+    if (edit) {
+      const el = document.querySelector(target);
+      if (el && el.children.length === 0) el.textContent = edit.before;
+      setEdits(p => {
+        const pageEdits = { ...p[page] };
+        delete pageEdits[target];
+        return { ...p, [page]: pageEdits };
+      });
+    }
+  };
+
+  return { edits, editor, revertTextEdit };
 }
 export function ChangeHandoff({ payload, summary }: { payload: string; summary: string[] }) {
   const [status, setStatus] = useState('');

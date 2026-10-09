@@ -7,10 +7,10 @@ export default function ChapterPage() {
   return (
     <motion.div
       key="chapter"
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
       className="flex flex-col md:flex-row w-full h-full bg-[#0B0F19] overflow-hidden relative"
     >
       {/* Subtle tech grid background */}

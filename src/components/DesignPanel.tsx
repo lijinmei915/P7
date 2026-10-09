@@ -1,10 +1,25 @@
 import { DesignElement, isDesignElement, iconName } from '../design/elements';
-import { HistoryProvider, HistoryButtons, useRecordedState } from '../design/history';
+import { HistoryProvider, useRecordedState } from '../design/history';
 import { tokenTargets, visibleTargets } from '../design/inspect';
 import ElementEditor from './ElementEditor';
-import { ChangeHandoff } from './TextChanges';
+import DesignPanelFooter from './DesignPanelFooter';
+import { X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { controls, defaults, normalize, Settings, storageKey } from '../design/settings';
+import { ChangeRecord } from '../design/changes';
+
+function findDefaultElement(): DesignElement | null {
+  const canvas = document.querySelector('.deck-canvas');
+  if (!canvas) return null;
+  const card = canvas.querySelector<DesignElement>('[data-design-card], .survey-direction, .deck-card');
+  if (card) return card;
+  const layout = canvas.querySelector<DesignElement>('[data-design-layout]');
+  if (layout && layout !== canvas) return layout;
+  const title = canvas.querySelector<DesignElement>('h2, [data-design-type="title"], header h1');
+  if (title) return title;
+  const child = canvas.querySelector<DesignElement>('.deck-page > div, .deck-page > section, .deck-page > *');
+  return child || null;
+}
 
 function DesignPanelContent({ pageId, pageNumber }: { pageId: string; pageNumber: number }) {
   const [mode, setMode] = useState<'edit' | 'library'>('edit');
@@ -13,8 +28,26 @@ function DesignPanelContent({ pageId, pageNumber }: { pageId: string; pageNumber
   const [open, setOpen] = useState(false);
   const [handoff, setHandoff] = useState('');
   const [changeSummary, setChangeSummary] = useState<string[]>([]);
+  const [elementRecords, setElementRecords] = useState<ChangeRecord[]>([]);
   const [selectedElement, setSelectedElement] = useState<DesignElement | null>(null);
-  useEffect(() => { setSelectedElement(null); }, [pageId, open]);
+
+  // Auto-select primary content when panel opens or page changes
+  useEffect(() => {
+    if (!open) {
+      setSelectedElement(null);
+      return;
+    }
+    const el = findDefaultElement();
+    if (el) {
+      setSelectedElement(el);
+    } else {
+      const timer = setTimeout(() => {
+        const delayedEl = findDefaultElement();
+        if (delayedEl) setSelectedElement(delayedEl);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [pageId, open]);
   const [settings, setSettings] = useRecordedState<Settings>(() => {
     try { return normalize(JSON.parse(localStorage.getItem(storageKey) || '{}')); } catch { return { ...defaults }; }
   });
@@ -80,9 +113,17 @@ function DesignPanelContent({ pageId, pageNumber }: { pageId: string; pageNumber
       if (!(target instanceof Element) || !target.closest('.deck-canvas')) return;
       event.preventDefault(); event.stopPropagation();
       const card = target.closest<DesignElement>('[data-design-card]');
-      const isContainerSpace = target.matches('div,section,article') && target.children.length > 0;
+      const isTextLeaf = target.matches('p, h1, h2, h3, h4, h5, h6, span, small, strong, label, input, button, img') || (target.children.length === 0 && Boolean(target.textContent?.trim()));
       const svg = target.closest('svg');
-      const selected = svg instanceof SVGSVGElement ? svg : card && isContainerSpace ? card : isDesignElement(target) ? target : target.closest<DesignElement>('div');
+      const selected = svg instanceof SVGSVGElement 
+        ? svg 
+        : isTextLeaf 
+          ? (isDesignElement(target) ? target : target.closest<DesignElement>('p, h1, h2, h3, h4, span, div') || target) 
+          : card 
+            ? card 
+            : isDesignElement(target) 
+              ? target 
+              : target.closest<DesignElement>('div');
       if (selected) { setSelectedElement(selected); setMode('edit'); }
       let element: Element | null = target;
       let key = '';
@@ -110,12 +151,27 @@ function DesignPanelContent({ pageId, pageNumber }: { pageId: string; pageNumber
   return <div className="design-tools" onKeyDown={e => { e.stopPropagation(); if (e.key === 'Escape') dismiss(); }}>
     <button ref={trigger} className="design-trigger" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="design-panel">设计规范</button>
     <aside hidden={!open} id="design-panel" role="dialog" aria-label="设计规范面板" className="design-panel">
-      <div className="design-fixed-heading"><div className="design-panel-heading" style={{ justifyContent: 'flex-end' }}><button ref={close} onClick={dismiss} aria-label="关闭设计规范">×</button></div>
-      <div className="design-scope" role="group" aria-label="面板功能"><button aria-pressed={mode === 'edit'} onClick={() => setMode('edit')}>编辑元素</button><button aria-pressed={mode === 'library'} onClick={() => setMode('library')}>规范库</button></div>
-      </div><div className="design-panel-scroll"><div hidden={mode !== 'library'}><div className="design-scope" role="group" aria-label="规范范围"><button aria-pressed={scope === 'page'} onClick={() => setScope('page')}>当页规范 · {String(pageNumber).padStart(2, '0')}</button><button aria-pressed={scope === 'global'} onClick={() => setScope('global')}>全局规范</button></div>
+      <div className="design-fixed-heading">
+        <div className="design-panel-topbar">
+          <div className="design-scope design-panel-tabs" role="group" aria-label="面板功能">
+            <button aria-pressed={mode === 'edit'} onClick={() => {
+              setMode('edit');
+              if (!selectedElement) {
+                const el = findDefaultElement();
+                if (el) setSelectedElement(el);
+              }
+            }}>编辑元素</button>
+            <button aria-pressed={mode === 'library'} onClick={() => setMode('library')}>规范库</button>
+          </div>
+          <button ref={close} className="design-panel-close-btn" onClick={dismiss} aria-label="关闭设计规范" title="关闭面板 (Esc)">
+            <X size={15} />
+          </button>
+        </div>
+      </div>
+      <div className="design-panel-scroll"><div hidden={mode !== 'library'}><div className="design-scope" role="group" aria-label="规范范围"><button aria-pressed={scope === 'page'} onClick={() => setScope('page')}>当页规范 · {String(pageNumber).padStart(2, '0')}</button><button aria-pressed={scope === 'global'} onClick={() => setScope('global')}>全局规范</button></div>
       <p className="design-help">{scope === 'page' ? '仅展示本页已接入的规范；修改仍会同步到使用同一规范的页面。' : '整套 PPT 的共享规范；标注本页使用情况。'}</p></div>
-      <div hidden={mode !== 'edit'} className="design-inspector"><p role="status">{activeToken ? `${controls.find(c => c.key === activeToken)?.label} · 当前可见 ${targetCount} 处` : '编辑模式已开启，直接点击页面文字或卡片即可编辑。'}</p>{activeToken && <button onClick={() => setActiveToken('')}>清除高亮</button>}</div>
-      <ElementEditor scope={scope} mode={mode} element={open ? selectedElement : null} pageId={pageId} onSelect={setSelectedElement} onHandoff={setHandoff} onSummary={setChangeSummary} />
+      {mode === 'edit' && activeToken && <div className="design-inspector"><p role="status">{`${controls.find(c => c.key === activeToken)?.label} · 当前可见 ${targetCount} 处`}</p><button onClick={() => setActiveToken('')}>清除高亮</button></div>}
+      <ElementEditor scope={scope} mode={mode} element={open ? selectedElement : null} pageId={pageId} onSelect={setSelectedElement} onHandoff={setHandoff} onSummary={setChangeSummary} onRecordsChange={setElementRecords} />
       {mode === 'library' && ['色彩', '排版', '圆角', '动效'].map(group => {
         const renderControl = (c: typeof controls[number]) => <label key={c.key} id={`design-control-${c.key}`} className={`design-control ${activeToken === c.key ? 'is-active' : ''}`} onClick={() => setActiveToken(c.key)} onFocus={() => setActiveToken(c.key)}><span>{c.label}<output>{c.key === 'radius-scale' ? `${Math.round(Number(settings[c.key]) * 100)}%` : settings[c.key] + (c.type === 'range' ? c.unit : '')}</output></span><small className="design-usage">{pageCounts[c.key] ? `本页 ${pageCounts[c.key]} 处` : '本页未使用'}</small><input aria-label={c.label} type={c.type} value={settings[c.key]} {...(c.type === 'range' ? { min: c.min, max: c.max, step: c.step } : {})} onChange={e => setSettings(s => ({ ...s, [c.key]: e.target.value }))} /></label>;
         const grouped = controls.filter(c => c.group === group && (scope === 'global' || pageCounts[c.key] > 0));
@@ -133,9 +189,45 @@ function DesignPanelContent({ pageId, pageNumber }: { pageId: string; pageNumber
           </details>}
         </> : grouped.map(renderControl)}</fieldset>;
       })}
-      </div><div className="design-fixed-footer"><HistoryButtons /><div className="design-actions design-footer"><button onClick={() => { setSettings({ ...defaults }); setMessage('已恢复默认规范。'); }}>恢复默认</button><button onClick={download}>导出变量</button><button onClick={() => file.current?.click()}>导入变量</button><ChangeHandoff summary={[...changeSummary, ...controls.filter(c => settings[c.key] !== defaults[c.key]).map(c => `${c.label}：${defaults[c.key]} → ${settings[c.key]}${c.type === 'range' ? c.unit : ''}`)]} payload={handoff + '\n全局规范：\n' + JSON.stringify(settings, null, 2)} /></div>
+      </div>
+      {(() => {
+        const tokenRecords: ChangeRecord[] = controls
+          .filter(c => settings[c.key] !== defaults[c.key])
+          .map(c => {
+            const raw = `全局规范 · ${c.label}：${defaults[c.key]} → ${settings[c.key]}${c.type === 'range' ? c.unit : ''}`;
+            return {
+              id: `token-${c.key}`,
+              category: 'token' as const,
+              title: `全局规范 · ${c.label}`,
+              description: `${defaults[c.key]} → ${settings[c.key]}${c.type === 'range' ? c.unit : ''}`,
+              rawText: raw,
+              onDelete: () => {
+                setSettings(s => ({ ...s, [c.key]: defaults[c.key] }));
+                setMessage(`已恢复「${c.label}」为默认值。`);
+              },
+            };
+          });
+
+        const allRecords = [...elementRecords, ...tokenRecords];
+
+        return (
+          <DesignPanelFooter
+            onReset={() => {
+              setSettings({ ...defaults });
+              elementRecords.forEach(r => r.onDelete());
+              setMessage('已恢复默认规范与所有改动。');
+            }}
+            onDownload={download}
+            onUpload={() => file.current?.click()}
+            summary={[...changeSummary, ...tokenRecords.map(r => r.rawText)]}
+            payload={handoff + '\n全局规范：\n' + JSON.stringify(settings, null, 2)}
+            noticeMessage={message}
+            onClearNotice={() => setMessage('')}
+            records={allRecords}
+          />
+        );
+      })()}
       <input ref={file} hidden type="file" accept="application/json,.json" onChange={async e => { const f = e.target.files?.[0]; if (!f) return; try { const data = JSON.parse(await f.text()); if (data.version !== 1 || !data.tokens || typeof data.tokens !== 'object') throw new Error(); setSettings(normalize(data.tokens)); setMessage('已导入并应用。'); } catch { setMessage('文件格式不正确，请选择本面板导出的 JSON。'); } e.target.value = ''; }} />
-      <p role="status" className="design-help">{message}</p></div>
     </aside>
   </div>;
 }

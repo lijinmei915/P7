@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "description": "",
+  "name": "P7 作品集演示",
+  "description": "产品设计与业务架构策略汇报演示平台",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
